@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Coffee, Loader2, Lock, Mail, ShieldCheck } from "lucide-react";
 
 export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<LoginShell />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/admin";
@@ -34,6 +42,90 @@ export default function AdminLoginPage() {
     }
   }
 
+  return (
+    <LoginShell>
+      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+        <div>
+          <label
+            htmlFor="admin-email"
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-espresso-500"
+          >
+            Email
+          </label>
+          <div className="relative mt-2">
+            <Mail
+              className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-espresso-400"
+              aria-hidden
+            />
+            <input
+              id="admin-email"
+              type="email"
+              autoFocus
+              required
+              autoComplete="username"
+              inputMode="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input pl-11"
+              placeholder="you@example.com"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label
+            htmlFor="admin-password"
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-espresso-500"
+          >
+            Password
+          </label>
+          <div className="relative mt-2">
+            <Lock
+              className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-espresso-400"
+              aria-hidden
+            />
+            <input
+              id="admin-password"
+              type="password"
+              required
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input pl-11"
+              placeholder="••••••••"
+            />
+          </div>
+        </div>
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={state === "loading" || !email || !password}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-espresso-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-cream-50 transition-all duration-200 hover:-translate-y-0.5 hover:bg-espresso-800 hover:shadow-md active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {state === "loading" ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Signing in…
+            </>
+          ) : (
+            "Sign in"
+          )}
+        </button>
+      </form>
+
+      <p className="mt-5 text-[11px] text-espresso-400">
+        Authorised access only. All actions are logged.
+      </p>
+    </LoginShell>
+  );
+}
+
+/**
+ * The visual chrome around the form. Also doubles as the Suspense fallback so
+ * users never see a blank screen while useSearchParams resolves.
+ */
+function LoginShell({ children }: { children?: React.ReactNode }) {
   return (
     <div className="grid min-h-screen place-items-center bg-espresso-900 px-5 py-12 text-cream-50">
       <div className="absolute inset-0 overflow-hidden">
@@ -72,79 +164,7 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
-            <div>
-              <label
-                htmlFor="admin-email"
-                className="text-xs font-semibold uppercase tracking-[0.2em] text-espresso-500"
-              >
-                Email
-              </label>
-              <div className="relative mt-2">
-                <Mail
-                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-espresso-400"
-                  aria-hidden
-                />
-                <input
-                  id="admin-email"
-                  type="email"
-                  autoFocus
-                  required
-                  autoComplete="username"
-                  inputMode="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input pl-11"
-                  placeholder="you@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="admin-password"
-                className="text-xs font-semibold uppercase tracking-[0.2em] text-espresso-500"
-              >
-                Password
-              </label>
-              <div className="relative mt-2">
-                <Lock
-                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-espresso-400"
-                  aria-hidden
-                />
-                <input
-                  id="admin-password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input pl-11"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            {error && <p className="text-sm text-red-600">{error}</p>}
-
-            <button
-              type="submit"
-              disabled={state === "loading" || !email || !password}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-espresso-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-cream-50 transition-all duration-200 hover:-translate-y-0.5 hover:bg-espresso-800 hover:shadow-md active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {state === "loading" ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Signing in…
-                </>
-              ) : (
-                "Sign in"
-              )}
-            </button>
-          </form>
-
-          <p className="mt-5 text-[11px] text-espresso-400">
-            Authorised access only. All actions are logged.
-          </p>
+          {children}
         </div>
       </div>
     </div>
