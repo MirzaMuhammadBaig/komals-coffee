@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -25,14 +25,8 @@ export default function AnimatedTagline({
 }: Props) {
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"in" | "out">("in");
-  const reducedRef = useRef(false);
 
   useEffect(() => {
-    reducedRef.current = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reducedRef.current) return;
-
     let timer: number;
     let mounted = true;
 

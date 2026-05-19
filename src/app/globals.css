@@ -21,16 +21,12 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
-}
+/* prefers-reduced-motion respect is handled per-component now (the JS
+   components honour it where it matters — large reveals, scroll triggers).
+   We intentionally do NOT blanket-disable all CSS animations here, because
+   decorative continuous animations (steam, beans, blobs, ken-burns) are not
+   the kind of motion that triggers vestibular issues, and macOS's
+   "Reduce motion" setting was killing every visual effect on the site. */
 
 html {
   scroll-behavior: smooth;

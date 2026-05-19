@@ -122,8 +122,9 @@ export default function MenuExplorer() {
     <>
       <section className="sticky top-20 z-30 border-b border-espresso-100 bg-cream-50/90 backdrop-blur">
         <div className="container-base flex flex-col gap-3 py-4 sm:py-5">
-          {/* Search input */}
-          <div className="relative">
+          {/* Search input — capped width on bigger screens so it doesn't
+              dwarf the page. Full width on mobile for thumb-friendly typing. */}
+          <div className="relative w-full lg:max-w-md">
             <Search
               className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-espresso-400"
               aria-hidden
@@ -134,13 +135,13 @@ export default function MenuExplorer() {
               role="searchbox"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search drinks by name, flavour or tag..."
+              placeholder="Search drinks…"
               aria-label="Search drinks"
               aria-controls="menu-results"
               enterKeyHint="search"
               autoComplete="off"
               spellCheck={false}
-              className="w-full rounded-full border border-espresso-100 bg-white py-3 pl-11 pr-12 text-sm text-espresso-800 transition-all duration-200 placeholder:text-espresso-300 hover:border-espresso-200 focus:border-espresso-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-caramel-400/40 sm:pr-20"
+              className="w-full rounded-full border border-espresso-100 bg-white py-2.5 pl-11 pr-12 text-sm text-espresso-800 transition-all duration-200 placeholder:text-espresso-300 hover:border-espresso-200 focus:border-espresso-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-caramel-400/40 sm:pr-20"
             />
             {query ? (
               <button

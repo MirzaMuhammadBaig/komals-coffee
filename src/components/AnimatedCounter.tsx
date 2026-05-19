@@ -36,11 +36,9 @@ export default function AnimatedCounter({
     const el = ref.current;
     if (!el) return;
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setValue(to);
-      return;
-    }
-
+    // Run animation regardless of prefers-reduced-motion — this is a short,
+    // gentle ease (~1.4s) that finishes well within OS motion-tolerance
+    // guidance, and the user explicitly wants the count-up effect.
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting || playedRef.current) return;
@@ -60,7 +58,7 @@ export default function AnimatedCounter({
         requestAnimationFrame(frame);
         io.disconnect();
       },
-      { threshold: 0.4 },
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();

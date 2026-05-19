@@ -48,7 +48,8 @@ export default function LiveTicker() {
   const [phase, setPhase] = useState<"in" | "out">("in");
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Always rotate — short, subtle text crossfade; pauses when tab is hidden
+    // so we never waste cycles on a backgrounded tab.
     const tick = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
       setPhase("out");
