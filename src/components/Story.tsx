@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/data/site";
+import { reviewSummary } from "@/lib/data/reviews";
 
 export default function Story() {
   return (
@@ -37,10 +38,10 @@ export default function Story() {
           <dl className="mt-10 grid grid-cols-3 gap-6 border-t border-espresso-100 pt-8">
             <div className="group cursor-default rounded-xl p-2 transition-all duration-300 hover:-translate-y-1">
               <dt className="text-xs uppercase tracking-[0.2em] text-espresso-400 transition-colors group-hover:text-caramel-600">
-                foodpanda
+                Google
               </dt>
               <dd className="mt-1 font-display text-3xl text-espresso-800 transition-colors group-hover:text-caramel-700">
-                {site.stats.foodpandaRating}★
+                {site.stats.googleRating}★
               </dd>
             </div>
             <div className="group cursor-default rounded-xl p-2 transition-all duration-300 hover:-translate-y-1">
@@ -48,7 +49,7 @@ export default function Story() {
                 Guest reviews
               </dt>
               <dd className="mt-1 font-display text-3xl text-espresso-800 transition-colors group-hover:text-caramel-700">
-                {site.stats.foodpandaReviewCount}
+                {reviewSummary.totalCount}+
               </dd>
             </div>
             <div className="group cursor-default rounded-xl p-2 transition-all duration-300 hover:-translate-y-1">

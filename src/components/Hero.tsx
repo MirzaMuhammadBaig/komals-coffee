@@ -4,6 +4,7 @@ import { Star, Sparkles, PowerOff } from "lucide-react";
 import { site } from "@/lib/data/site";
 import { getStoreSettings } from "@/lib/admin/store";
 import { getEffectiveStoreState, getNextOpening } from "@/lib/hours";
+import { reviewSummary } from "@/lib/data/reviews";
 import CoffeeDecorations from "@/components/CoffeeDecorations";
 import AnimatedTagline from "@/components/AnimatedTagline";
 import AnimatedCounter from "@/components/AnimatedCounter";
@@ -117,9 +118,13 @@ export default async function Hero() {
             One barista. One kitchen. One promise. Frothy, creamy,
             made-to-order specialty coffee. Rated{" "}
             <span className="font-semibold text-cream-50">
+              {site.stats.googleRating}★
+            </span>{" "}
+            on Google and{" "}
+            <span className="font-semibold text-cream-50">
               {site.stats.foodpandaRating}★
             </span>{" "}
-            by {site.stats.foodpandaReviewCount} guests on foodpanda.
+            on foodpanda.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
@@ -134,15 +139,15 @@ export default async function Hero() {
             </Link>
           </div>
 
-          {/* Three stat counters */}
+          {/* Three stat counters — aggregate across Google + foodpanda */}
           <dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-cream-100/15 pt-6 sm:mt-12 sm:gap-6 sm:pt-8">
             <div>
               <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-100/60">
-                Rating
+                Avg rating
               </dt>
               <dd className="mt-1 flex items-baseline gap-1 font-display text-xl text-cream-50 sm:text-2xl lg:text-3xl">
                 <AnimatedCounter
-                  to={site.stats.foodpandaRating}
+                  to={reviewSummary.averageRating}
                   decimals={1}
                   duration={1400}
                 />
@@ -155,7 +160,7 @@ export default async function Hero() {
               </dt>
               <dd className="mt-1 font-display text-xl text-cream-50 sm:text-2xl lg:text-3xl">
                 <AnimatedCounter
-                  to={site.stats.foodpandaReviewCount}
+                  to={reviewSummary.totalCount}
                   duration={1600}
                   suffix="+"
                 />

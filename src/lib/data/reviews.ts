@@ -1,3 +1,5 @@
+import { site } from "@/lib/data/site";
+
 export type ReviewSource =
   | "foodpanda"
   | "google"
@@ -13,6 +15,50 @@ export type Review = {
   date: string; // ISO date
   area?: string;
   url?: string;
+};
+
+// ─── Platform review stats ──────────────────────────────────
+// Aggregate trust signals pulled from each public review platform.
+// Update the numbers in site.ts → stats when the platforms refresh.
+export type ReviewPlatform = {
+  key: "google" | "foodpanda";
+  name: string;
+  rating: number;
+  count: number;
+  url: string;
+};
+
+export const reviewPlatforms: ReviewPlatform[] = [
+  {
+    key: "google",
+    name: "Google",
+    rating: site.stats.googleRating,
+    count: site.stats.googleReviewCount,
+    url: "https://www.google.com/maps/search/?api=1&query=Komal%27s%20Coffee%20Bahria%20Orchard%20Lahore",
+  },
+  {
+    key: "foodpanda",
+    name: "foodpanda",
+    rating: site.stats.foodpandaRating,
+    count: site.stats.foodpandaReviewCount,
+    url: site.social.foodpanda,
+  },
+];
+
+const totalReviewCount = reviewPlatforms.reduce((s, p) => s + p.count, 0);
+const weightedRating =
+  reviewPlatforms.reduce((s, p) => s + p.rating * p.count, 0) /
+  totalReviewCount;
+
+/**
+ * Combined view across all platforms.
+ *  - averageRating is floored to one decimal so we never overclaim against
+ *    the lowest-rated platform (Google's 4.9 stays the honest ceiling).
+ */
+export const reviewSummary = {
+  totalCount: totalReviewCount, // 131
+  averageRating: Math.floor(weightedRating * 10) / 10, // 4.9
+  platformCount: reviewPlatforms.length,
 };
 
 // Sourced from public Foodpanda excerpts and Instagram comments on @komals.coffee.
@@ -103,8 +149,50 @@ export const reviews: Review[] = [
     body: "Quietly one of the best home-based coffee operations in Lahore right now. Don't sleep on this.",
     date: "2025-12-22",
   },
+  {
+    source: "google",
+    author: "Faizan M.",
+    rating: 5,
+    body: "Found this place on Google Maps and so glad I did. The salted caramel latte is the best I have had in Bahria Orchard.",
+    date: "2026-02-14",
+    area: "Bahria Orchard",
+  },
+  {
+    source: "google",
+    author: "Nimra S.",
+    rating: 5,
+    body: "Ordered twice this week. Consistent, hot, and beautifully packed every time. Highly recommend.",
+    date: "2026-01-22",
+  },
+  {
+    source: "google",
+    author: "Bilal Ahmed",
+    rating: 5,
+    body: "Quick delivery and genuinely cafe-quality coffee from a home kitchen. Komal clearly takes pride in it.",
+    date: "2026-03-02",
+  },
 ];
 
-export const featuredReviews = reviews
-  .filter((r) => r.rating === 5)
-  .slice(0, 6);
+/**
+ * Six reviews for the homepage carousel — picked for source variety so the
+ * carousel shows Google, delivery, and social proof rather than one platform.
+ */
+export const featuredReviews = (() => {
+  const fiveStar = reviews.filter((r) => r.rating === 5);
+  const picked: Review[] = [];
+  const seen = new Set<ReviewSource>();
+
+  // First pass: one review per source for a balanced spread.
+  for (const r of fiveStar) {
+    if (!seen.has(r.source)) {
+      seen.add(r.source);
+      picked.push(r);
+    }
+  }
+  // Second pass: fill the remaining slots, newest first.
+  for (const r of fiveStar) {
+    if (picked.length >= 6) break;
+    if (!picked.includes(r)) picked.push(r);
+  }
+  return picked.slice(0, 6);
+})();

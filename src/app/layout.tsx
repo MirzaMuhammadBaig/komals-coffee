@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Dancing_Script } from "next/font/google";
 import { site } from "@/lib/data/site";
+import CleanPreviewUrl from "@/components/CleanPreviewUrl";
 import "./globals.css";
 
 const inter = Inter({
@@ -65,6 +66,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} ${dancing.variable}`}
     >
       <body className="min-h-screen bg-cream-50 font-sans text-espresso-800 antialiased">
+        <CleanPreviewUrl />
         {children}
       </body>
     </html>

@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ExternalLink } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import CtaBanner from "@/components/CtaBanner";
-import { reviews } from "@/lib/data/reviews";
+import {
+  reviews,
+  reviewPlatforms,
+  reviewSummary,
+} from "@/lib/data/reviews";
 import { site } from "@/lib/data/site";
 import { formatDate } from "@/lib/utils";
 
@@ -16,45 +20,71 @@ const sourceLabel: Record<string, string> = {
 
 export const metadata: Metadata = {
   title: "Reviews",
-  description: `${site.stats.foodpandaRating}★ from ${site.stats.foodpandaReviewCount}+ verified guest reviews. See what Komal's Coffee customers really say.`,
+  description: `${reviewSummary.averageRating}★ from ${reviewSummary.totalCount}+ reviews across Google and foodpanda. See what Komal's Coffee customers really say.`,
 };
 
 export default function ReviewsPage() {
-  const byFood = reviews.filter((r) => r.source === "foodpanda").length;
-  const byIg = reviews.filter((r) => r.source === "instagram").length;
-  const byFb = reviews.filter((r) => r.source === "facebook").length;
-
   return (
     <>
       <PageHeader
         eyebrow="What guests say"
-        title={`${site.stats.foodpandaRating}★ from ${site.stats.foodpandaReviewCount}+ guests.`}
-        description="A live feed of what our customers say, pulled from verified orders, Instagram and Facebook. No edits, no filters. What you read is what gets posted publicly."
+        title={`${reviewSummary.averageRating}★ from ${reviewSummary.totalCount}+ reviews.`}
+        description="Komal's Coffee is rated across Google and foodpanda, plus Instagram and Facebook. No edits, no filters. What you read is what guests posted publicly."
       />
 
-      <section className="border-b border-espresso-100 bg-cream-50">
-        <div className="container-base grid gap-6 py-10 sm:grid-cols-3">
-          <div>
-            <p className="font-display text-4xl text-espresso-800">
-              {site.stats.foodpandaRating}★
-            </p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-espresso-400">
-              Verified guest average · {site.stats.foodpandaReviewCount}+ orders
-            </p>
-          </div>
-          <div>
-            <p className="font-display text-4xl text-espresso-800">100%</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-espresso-400">
-              5-star ratings from verified guests
-            </p>
-          </div>
-          <div>
-            <p className="font-display text-4xl text-espresso-800">
-              {byFood + byIg + byFb}+
-            </p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-espresso-400">
-              Verified reviews across platforms
-            </p>
+      {/* Platform breakdown — aggregate + per-platform trust cards */}
+      <section className="border-b border-espresso-100 bg-cream-50 py-10 sm:py-12">
+        <div className="container-base">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Aggregate card */}
+            <div className="card flex flex-col justify-center bg-espresso-700 p-6 text-cream-50">
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="h-4 w-4 fill-caramel-400 text-caramel-400"
+                  />
+                ))}
+              </div>
+              <p className="mt-3 font-display text-4xl">
+                {reviewSummary.averageRating}★
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-[0.2em] text-cream-100/70">
+                Average across {reviewSummary.totalCount}+ reviews
+              </p>
+            </div>
+
+            {/* Per-platform cards */}
+            {reviewPlatforms.map((p) => (
+              <a
+                key={p.key}
+                href={p.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="card-hoverable group flex flex-col p-6 active:scale-[0.98]"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-espresso-400">
+                    {p.name}
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5 text-espresso-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </div>
+                <p className="mt-3 font-display text-4xl text-espresso-800 transition-colors group-hover:text-caramel-700">
+                  {p.rating}★
+                </p>
+                <p className="mt-1 text-xs uppercase tracking-[0.2em] text-espresso-400">
+                  {p.count} {p.name} reviews
+                </p>
+              </a>
+            ))}
+
+            {/* Five-star card */}
+            <div className="card flex flex-col justify-center p-6">
+              <p className="font-display text-4xl text-espresso-800">100%</p>
+              <p className="mt-1 text-xs uppercase tracking-[0.2em] text-espresso-400">
+                Of recent reviews are 5-star
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -103,14 +133,17 @@ export default function ReviewsPage() {
               Lahore. Takes 30 seconds, and we read every one.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <a
-                href={site.social.foodpanda}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="btn-primary"
-              >
-                Leave a review
-              </a>
+              {reviewPlatforms.map((p) => (
+                <a
+                  key={p.key}
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className={p.key === "google" ? "btn-primary" : "btn-ghost"}
+                >
+                  Review on {p.name}
+                </a>
+              ))}
               <a
                 href={site.social.instagram}
                 target="_blank"

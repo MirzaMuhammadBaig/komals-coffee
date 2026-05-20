@@ -1,7 +1,6 @@
 import { Star, Quote } from "lucide-react";
-import { featuredReviews } from "@/lib/data/reviews";
+import { featuredReviews, reviewSummary } from "@/lib/data/reviews";
 import { formatDate } from "@/lib/utils";
-import { site } from "@/lib/data/site";
 
 const sourceLabel: Record<string, string> = {
   google: "Google",
@@ -18,13 +17,12 @@ export default function ReviewsCarousel() {
         <div className="max-w-2xl">
           <p className="eyebrow text-caramel-400">What guests are saying</p>
           <h2 className="mt-4 font-display text-4xl text-cream-50 sm:text-5xl">
-            {site.stats.foodpandaRating}★ from{" "}
-            {site.stats.foodpandaReviewCount}+ verified guest orders
+            {reviewSummary.averageRating}★ from{" "}
+            {reviewSummary.totalCount}+ reviews
           </h2>
           <p className="mt-4 max-w-xl text-cream-100/70">
-            Live excerpts from verified orders, Instagram and Facebook. We
-            do not filter. These are real, public reviews from real
-            customers.
+            Rated across Google, foodpanda, Instagram and Facebook. We do not
+            filter. These are real, public reviews from real customers.
           </p>
         </div>
 

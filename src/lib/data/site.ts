@@ -30,7 +30,7 @@ export const site = {
   ],
   contact: {
     phone: "+92 300 0000000",
-    whatsapp: "+92 300 0000000",
+    whatsapp: "+92 320 9246199",
     email: "hello@komalscoffee.pk",
   },
   social: {
@@ -42,9 +42,11 @@ export const site = {
     tiktok: "https://www.tiktok.com/@komals.coffee",
   },
   stats: {
+    googleRating: 4.9,
+    googleReviewCount: 64,
     foodpandaRating: 5.0,
     foodpandaReviewCount: 67,
-    instagramFollowers: "575+",
+    instagramFollowers: "620+",
     yearStarted: 2024,
     deliveryRadius: "Bahria Orchard & nearby Lahore",
   },
