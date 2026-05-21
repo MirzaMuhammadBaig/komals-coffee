@@ -71,26 +71,29 @@ export default function CartDrawer() {
         isDrawerOpen ? "pointer-events-auto" : "pointer-events-none",
       )}
     >
-      {/* Backdrop */}
+      {/* Backdrop — fades a touch slower than the panel for a layered feel */}
       <button
         type="button"
         onClick={closeDrawer}
         aria-label="Close cart"
         tabIndex={isDrawerOpen ? 0 : -1}
         className={cn(
-          "absolute inset-0 cursor-default bg-espresso-900/55 backdrop-blur-sm transition-opacity duration-300",
+          "absolute inset-0 cursor-default bg-espresso-900/55 backdrop-blur-sm transition-opacity duration-[450ms] ease-out",
           isDrawerOpen ? "opacity-100" : "opacity-0",
         )}
       />
 
-      {/* Panel */}
+      {/* Panel — glides in on a soft spring easing */}
       <aside
         role="dialog"
         aria-modal="true"
         aria-label="Shopping cart"
         className={cn(
-          "absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-cream-50 shadow-2xl transition-transform duration-300 ease-out",
-          isDrawerOpen ? "translate-x-0" : "translate-x-full",
+          "absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-cream-50 shadow-2xl",
+          "transition-[transform,opacity] duration-[440ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform",
+          isDrawerOpen
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-80",
         )}
       >
         {/* Header */}
@@ -141,11 +144,22 @@ export default function CartDrawer() {
             </Link>
           </div>
         ) : (
-          <ul className="flex-1 divide-y divide-espresso-100 overflow-y-auto">
-            {items.map((line) => (
+          <ul
+            key={isDrawerOpen ? "cart-open" : "cart-closed"}
+            className="flex-1 divide-y divide-espresso-100 overflow-y-auto"
+          >
+            {items.map((line, i) => (
               <li
                 key={line.slug}
-                className="flex gap-3 px-5 py-4 sm:gap-4 sm:px-6"
+                className={cn(
+                  "flex gap-3 px-5 py-4 sm:gap-4 sm:px-6",
+                  isDrawerOpen && "cart-line-in",
+                )}
+                style={
+                  isDrawerOpen
+                    ? { animationDelay: `${80 + i * 65}ms` }
+                    : undefined
+                }
               >
                 <Link
                   href={`/menu/${line.slug}`}

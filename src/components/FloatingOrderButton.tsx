@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { MessageCircle, ShoppingBag } from "lucide-react";
 import { site } from "@/lib/data/site";
 import { whatsappLink, cn } from "@/lib/utils";
@@ -40,12 +39,14 @@ export default function FloatingOrderButton() {
         <span className="relative hidden sm:inline">WhatsApp</span>
       </a>
 
-      {hasItems ? (
+      {/* "View cart" only exists once the cart holds something — it
+          springs in from the corner the moment the first item lands. */}
+      {hasItems && (
         <button
           type="button"
           onClick={openDrawer}
           aria-label={`View cart, ${totalQty} ${totalQty === 1 ? "item" : "items"}`}
-          className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-espresso-800 text-cream-50 shadow-[0_10px_30px_-5px_rgba(40,24,15,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-espresso-900 hover:shadow-[0_15px_40px_-5px_rgba(40,24,15,0.7)] active:translate-y-0 active:scale-95 sm:h-auto sm:w-auto sm:gap-2.5 sm:px-5 sm:py-3 sm:text-sm sm:font-semibold sm:uppercase sm:tracking-wider"
+          className="group relative flex h-12 w-12 origin-bottom-right animate-fab-pop-in items-center justify-center rounded-full bg-espresso-800 text-cream-50 shadow-[0_10px_30px_-5px_rgba(40,24,15,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-espresso-900 hover:shadow-[0_15px_40px_-5px_rgba(40,24,15,0.7)] active:translate-y-0 active:scale-95 sm:h-auto sm:w-auto sm:gap-2.5 sm:px-5 sm:py-3 sm:text-sm sm:font-semibold sm:uppercase sm:tracking-wider"
         >
           <span className="relative inline-flex">
             <ShoppingBag className="h-5 w-5 transition-transform duration-300 group-hover:-rotate-6 sm:h-4 sm:w-4" />
@@ -58,18 +59,6 @@ export default function FloatingOrderButton() {
           </span>
           <span className="hidden sm:inline">View cart</span>
         </button>
-      ) : (
-        <Link
-          href="/order"
-          className="group hidden items-center gap-2 rounded-full bg-espresso-700 px-5 py-3 text-sm font-semibold text-cream-50 shadow-[0_10px_30px_-5px_rgba(40,24,15,0.5)] transition-all duration-300 hover:scale-105 hover:bg-espresso-800 hover:shadow-[0_15px_40px_-5px_rgba(40,24,15,0.7)] active:scale-95 sm:flex"
-        >
-          <span className="transition-transform duration-300 group-hover:-translate-x-0.5">
-            Order online
-          </span>
-          <span className="opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
-            →
-          </span>
-        </Link>
       )}
     </div>
   );

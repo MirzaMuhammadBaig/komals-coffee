@@ -1,35 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Star, Sparkles, PowerOff } from "lucide-react";
+import { Star } from "lucide-react";
 import { site } from "@/lib/data/site";
 import { getStoreSettings } from "@/lib/admin/store";
-import { getEffectiveStoreState, getNextOpening } from "@/lib/hours";
 import { reviewSummary } from "@/lib/data/reviews";
 import CoffeeDecorations from "@/components/CoffeeDecorations";
 import AnimatedTagline from "@/components/AnimatedTagline";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import ScrollIndicator from "@/components/ScrollIndicator";
-import { cn } from "@/lib/utils";
+import StoreStatusBadge from "@/components/StoreStatusBadge";
+import { computeStoreStatus } from "@/lib/hours";
 
 export default async function Hero() {
   const store = await getStoreSettings();
-  const { isOpen, reason } = getEffectiveStoreState({
-    is_open: store?.is_open,
-  });
-  const next = isOpen ? null : getNextOpening();
+  // Server seed — the client badge re-checks the clock live after hydration.
+  const manualOpen = store?.is_open !== false;
+  const initialStatus = computeStoreStatus(manualOpen);
 
-  // Compact label for the hero badge.
-  const badgeLabel = isOpen
-    ? "Open · Brewing now"
-    : reason === "manually_closed"
-      ? "Closed for now"
-      : next
-        ? next.dayLabel === "today"
-          ? `Closed · Opens at ${next.time}`
-          : next.dayLabel === "tomorrow"
-            ? `Closed · Opens tomorrow at ${next.time}`
-            : `Closed · Opens ${next.dayLabel} at ${next.time}`
-        : "Closed for now";
   return (
     <section className="group relative overflow-hidden bg-espresso-800 text-cream-50">
       <div className="absolute inset-0 bg-hero-grain opacity-90" aria-hidden />
@@ -55,36 +42,8 @@ export default async function Hero() {
 
       <div className="container-base relative grid min-h-[88vh] items-center py-20 sm:min-h-[90vh] sm:py-24 lg:min-h-[92vh] lg:py-28">
         <div className="max-w-3xl">
-          {/* Eyebrow status chip — reflects live store_settings */}
-          <div
-            className={cn(
-              "mb-6 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.3em] backdrop-blur-md ring-1",
-              isOpen
-                ? "bg-espresso-900/55 text-cream-100 ring-cream-100/15"
-                : "bg-red-900/55 text-red-100 ring-red-200/20",
-            )}
-          >
-            {isOpen ? (
-              <Sparkles className="h-3 w-3 text-caramel-400" />
-            ) : (
-              <PowerOff className="h-3 w-3 text-red-300" />
-            )}
-            <span>{badgeLabel}</span>
-            <span className="relative ml-1 inline-flex h-1.5 w-1.5">
-              <span
-                className={cn(
-                  "absolute inset-0 animate-ping rounded-full opacity-75",
-                  isOpen ? "bg-green-400" : "bg-red-400",
-                )}
-              />
-              <span
-                className={cn(
-                  "relative inline-flex h-1.5 w-1.5 rounded-full",
-                  isOpen ? "bg-green-400" : "bg-red-400",
-                )}
-              />
-            </span>
-          </div>
+          {/* Live store-status chip — re-checks the clock client-side */}
+          <StoreStatusBadge manualOpen={manualOpen} initial={initialStatus} />
 
           <h1 className="font-display text-4xl leading-[1.05] text-cream-50 sm:text-6xl lg:text-7xl">
             <span className="font-script block pb-1 text-5xl leading-[0.95] text-caramel-400 transition-colors duration-500 hover:text-caramel-300 sm:text-7xl lg:text-8xl">

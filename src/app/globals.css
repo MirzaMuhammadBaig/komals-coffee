@@ -160,6 +160,46 @@ html {
   }
 }
 
+/* Floating "View cart" button entrance — springs up from the corner
+   when the cart goes from empty to holding its first item. */
+@keyframes fabPopIn {
+  0% {
+    transform: translateY(28px) scale(0.4);
+    opacity: 0;
+  }
+  55% {
+    transform: translateY(-6px) scale(1.08);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(2px) scale(0.97);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fab-pop-in {
+  animation: fabPopIn 560ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Cart drawer line items glide in, gently staggered, as the panel opens. */
+@keyframes cartLineIn {
+  0% {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.cart-line-in {
+  animation: cartLineIn 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
 /* Suppress browser-native search input chrome (×, magnifier) so our own
    styled clear button is the only one visible. */
 input[type="search"]::-webkit-search-cancel-button,

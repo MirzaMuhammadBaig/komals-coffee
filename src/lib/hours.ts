@@ -91,6 +91,24 @@ export function getNextOpening(): { dayLabel: string; time: string } | null {
   return null;
 }
 
+export type StoreStatus = {
+  isOpen: boolean;
+  reason: "open" | "after_hours" | "manually_closed";
+  next: { dayLabel: string; time: string } | null;
+};
+
+/**
+ * Pure helper — recomputes the live store state from the admin's manual
+ * switch + the published schedule. Runs identically on server and client
+ * (the schedule check is timezone-locked to Asia/Karachi). Lives in this
+ * plain module — NOT in the client `StoreStatusBadge` — so server
+ * components (e.g. Hero) can call it across the RSC boundary.
+ */
+export function computeStoreStatus(manualOpen: boolean): StoreStatus {
+  const { isOpen, reason } = getEffectiveStoreState({ is_open: manualOpen });
+  return { isOpen, reason, next: isOpen ? null : getNextOpening() };
+}
+
 /**
  * Combine the admin's manual `is_open` switch with the schedule. The schedule
  * is the default (auto open during hours, auto close after them). The manual

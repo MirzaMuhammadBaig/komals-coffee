@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { menu, menuCategories } from "@/lib/data/menu";
 import { formatPkr } from "@/lib/utils";
 import AddToCartButton from "@/components/AddToCartButton";
+import GoToCheckoutButton from "@/components/GoToCheckoutButton";
 import SafeImage from "@/components/SafeImage";
 import CtaBanner from "@/components/CtaBanner";
 
@@ -120,9 +121,7 @@ export default function MenuItemPage({ params }: Props) {
                 variant="large"
                 preventLink={false}
               />
-              <Link href="/order#checkout-details" className="btn-ghost">
-                Go to checkout
-              </Link>
+              <GoToCheckoutButton slug={item.slug} />
             </div>
 
             <dl className="mt-12 grid gap-5 border-t border-espresso-100 pt-8 sm:grid-cols-3">

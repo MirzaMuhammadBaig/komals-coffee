@@ -1,5 +1,11 @@
 import Hero from "@/components/Hero";
 import LiveTicker from "@/components/LiveTicker";
+
+// Render fresh on every request so the hero store-status seed reflects the
+// real current time (a statically prerendered page would freeze it at build
+// time — which is exactly what made the badge stick on "Closed").
+export const dynamic = "force-dynamic";
+
 import Marquee from "@/components/Marquee";
 import PressStrip from "@/components/PressStrip";
 import CoffeeJourney from "@/components/CoffeeJourney";

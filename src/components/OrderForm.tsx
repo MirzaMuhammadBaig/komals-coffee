@@ -13,10 +13,11 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { menu } from "@/lib/data/menu";
+import { menu, type MenuItem } from "@/lib/data/menu";
 import { cn, formatPkr } from "@/lib/utils";
 import { site } from "@/lib/data/site";
 import { useCart } from "@/lib/cart/CartContext";
+import ProductDetailModal from "@/components/ProductDetailModal";
 
 type PaymentMethod = "cod" | "card";
 
@@ -24,6 +25,7 @@ export default function OrderForm() {
   const { items, total, totalQty, add, remove, setQty, clear, getQty } =
     useCart();
   const [query, setQuery] = useState("");
+  const [modalItem, setModalItem] = useState<MenuItem | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [state, setState] = useState<
     "idle" | "loading" | "redirecting" | "done" | "error"
@@ -155,6 +157,7 @@ export default function OrderForm() {
   const itemCount = totalQty;
 
   return (
+    <>
     <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:gap-8">
       <div>
         <div className="card overflow-hidden">
@@ -233,10 +236,15 @@ export default function OrderForm() {
                           : "hover:bg-cream-100/60",
                       )}
                     >
-                      <div className="min-w-0 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => setModalItem(m)}
+                        title={`View ${m.name} details`}
+                        className="min-w-0 flex-1 text-left"
+                      >
                         <p
                           className={cn(
-                            "truncate font-display text-base transition-colors duration-200 sm:text-lg",
+                            "truncate font-display text-base underline-offset-2 transition-colors duration-200 hover:underline sm:text-lg",
                             active
                               ? "text-caramel-700"
                               : "text-espresso-800 group-hover:text-caramel-700",
@@ -248,7 +256,7 @@ export default function OrderForm() {
                           {m.size ? `${m.size} · ` : ""}
                           {formatPkr(m.price)}
                         </p>
-                      </div>
+                      </button>
                       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
                         <button
                           type="button"
@@ -455,13 +463,18 @@ export default function OrderForm() {
                       type="button"
                       onClick={() => setQty(l.slug, 0)}
                       className="mt-1 shrink-0 text-espresso-300 transition-all duration-200 hover:scale-110 hover:rotate-12 hover:text-red-500 active:scale-90"
-                      aria-label="Remove from cart"
+                      aria-label={`Remove ${l.item.name} from cart`}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
-                    <span className="min-w-0 break-words">
+                    <button
+                      type="button"
+                      onClick={() => setModalItem(l.item)}
+                      className="min-w-0 break-words text-left underline-offset-2 transition-colors hover:text-caramel-700 hover:underline"
+                      title={`View ${l.item.name} details`}
+                    >
                       {l.qty} × {l.item.name}
-                    </span>
+                    </button>
                   </span>
                   <span className="shrink-0 tabular-nums">
                     {formatPkr(l.qty * l.item.price)}
@@ -613,5 +626,11 @@ export default function OrderForm() {
         </p>
       </form>
     </div>
+
+      <ProductDetailModal
+        item={modalItem}
+        onClose={() => setModalItem(null)}
+      />
+    </>
   );
 }
