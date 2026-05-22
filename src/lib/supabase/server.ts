@@ -44,6 +44,16 @@ export function createSupabaseServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      // Force every request through an uncached fetch. Next.js otherwise
+      // caches GETs in its Data Cache, which would make admin screens —
+      // and the public site's store settings — read a stale snapshot
+      // even right after a save. Admin data must always be live.
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+          fetch(input, { ...init, cache: "no-store" }),
+      },
+    },
   );
 }
