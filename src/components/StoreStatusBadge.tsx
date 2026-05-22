@@ -53,8 +53,8 @@ export default function StoreStatusBadge({
       className={cn(
         "mb-6 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.3em] backdrop-blur-md ring-1",
         isOpen
-          ? "bg-espresso-900/55 text-cream-100 ring-cream-100/15"
-          : "bg-red-900/55 text-red-100 ring-red-200/20",
+          ? "badge-glow-open bg-espresso-900/55 text-cream-100 ring-cream-100/15"
+          : "badge-glow-closed bg-red-900/55 text-red-100 ring-red-200/20",
       )}
     >
       {isOpen ? (

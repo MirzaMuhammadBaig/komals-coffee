@@ -1,63 +1,58 @@
-import { AlertCircle, MessageCircle } from "lucide-react";
+import { AlertCircle, Megaphone, MessageCircle } from "lucide-react";
 import { site } from "@/lib/data/site";
 import { whatsappLink } from "@/lib/utils";
 
-type Props = {
-  reason: string | null;
-  until: string | null;
-  announcement: string | null;
-};
-
-function formatDate(iso: string | null) {
-  if (!iso) return null;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return null;
-  return new Intl.DateTimeFormat("en-PK", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(d);
-}
-
+/**
+ * Site-wide notice strip. Renders in two tones:
+ *  - "warn"  → store is closed (manually by Komal, or outside opening
+ *              hours). Leads with "We are temporarily closed." + a
+ *              WhatsApp shortcut so customers can still reach out.
+ *  - "info"  → a general announcement (deals, holiday notes, etc).
+ */
 export default function StoreClosedBanner({
-  reason,
-  until,
-  announcement,
-}: Props) {
-  const untilLabel = formatDate(until);
+  message,
+  tone = "warn",
+}: {
+  message: string | null;
+  tone?: "warn" | "info";
+}) {
+  if (!message) return null;
+  const isWarn = tone === "warn";
 
   return (
-    <div className="bg-espresso-900 text-cream-50">
-      <div className="container-base flex flex-wrap items-center justify-center gap-3 py-3 text-center text-sm sm:gap-4">
-        <AlertCircle className="h-4 w-4 shrink-0 text-caramel-400" />
+    <div
+      role="alert"
+      className={
+        "relative z-40 " +
+        (isWarn
+          ? "bg-espresso-900 text-cream-50"
+          : "bg-caramel-500 text-espresso-900")
+      }
+    >
+      <div className="container-base flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 py-3 text-center text-sm sm:gap-4">
+        {isWarn ? (
+          <AlertCircle className="h-4 w-4 shrink-0 text-caramel-400" />
+        ) : (
+          <Megaphone className="h-4 w-4 shrink-0" />
+        )}
         <p className="leading-snug">
-          <span className="font-semibold">We are temporarily closed.</span>{" "}
-          {reason || "Komal is taking a short break."}
-          {untilLabel && (
-            <>
-              {" "}
-              <span className="text-cream-100/70">
-                Reopens {untilLabel}.
-              </span>
-            </>
-          )}
-          {announcement && (
-            <>
-              {" "}
-              <span className="text-cream-100/70">{announcement}</span>
-            </>
-          )}
+          {isWarn && (
+            <span className="font-semibold">We are temporarily closed.</span>
+          )}{" "}
+          <span className={isWarn ? "text-cream-100/80" : "font-medium"}>
+            {message}
+          </span>
         </p>
-        <a
-          href={whatsappLink(site.contact.whatsapp)}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="inline-flex items-center gap-1.5 rounded-full bg-cream-50/10 px-3 py-1 text-xs font-semibold transition-colors hover:bg-cream-50/20"
-        >
-          <MessageCircle className="h-3 w-3" /> Message Komal
-        </a>
+        {isWarn && (
+          <a
+            href={whatsappLink(site.contact.whatsapp)}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex items-center gap-1.5 rounded-full bg-cream-50/10 px-3 py-1 text-xs font-semibold transition-colors hover:bg-cream-50/20"
+          >
+            <MessageCircle className="h-3 w-3" /> Message Komal
+          </a>
+        )}
       </div>
     </div>
   );

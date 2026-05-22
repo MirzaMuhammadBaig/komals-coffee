@@ -113,16 +113,18 @@ export default function StoreSettingsForm({
           />
         </Field>
 
-        <Field
-          label="Site-wide announcement (shown on banner when closed)"
-        >
+        <Field label="Site-wide announcement (always shown at the top of every page)">
           <textarea
             rows={2}
             value={v.announcement}
             onChange={(e) => setV({ ...v, announcement: e.target.value })}
             className="input resize-none"
-            placeholder="Anything else customers should know?"
+            placeholder="E.g. Free delivery this weekend on orders over Rs 1,500!"
           />
+          <p className="mt-1.5 text-xs text-espresso-400">
+            Appears on a banner across the whole site — open or closed.
+            Leave it empty to remove the banner.
+          </p>
         </Field>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -143,34 +145,68 @@ export default function StoreSettingsForm({
         </div>
       </section>
 
-      <aside className="card p-6">
-        <h3 className="font-display text-lg text-espresso-800">
-          What customers will see
-        </h3>
-        <p className="mt-2 text-xs text-espresso-500">
-          Preview of the banner that appears at the top of every page when the
-          store is closed.
-        </p>
-        <div className="mt-4 overflow-hidden rounded-2xl bg-espresso-900 px-5 py-4 text-sm text-cream-50">
-          <p className="font-semibold">We are temporarily closed.</p>
-          <p className="mt-1 text-xs text-cream-100/80">
-            {v.closed_reason || "Komal is taking a short break."}
-            {v.closed_until && (
-              <>
-                {" "}
-                Reopens{" "}
-                {new Date(v.closed_until).toLocaleString("en-PK", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-                .
-              </>
-            )}
-            {v.announcement && <> {v.announcement}</>}
+      <aside className="card space-y-4 p-6">
+        <div>
+          <h3 className="font-display text-lg text-espresso-800">
+            What customers will see
+          </h3>
+          <p className="mt-1 text-xs text-espresso-500">
+            Live preview of the banners shown at the very top of every page.
           </p>
+        </div>
+
+        {/* Closed banner — only while the store is closed. */}
+        <div>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
+            Closed banner
+          </p>
+          {v.is_open ? (
+            <p className="rounded-2xl border border-dashed border-espresso-200 px-5 py-4 text-xs text-espresso-400">
+              Store is open — this banner is hidden.
+            </p>
+          ) : (
+            <div className="overflow-hidden rounded-2xl bg-espresso-900 px-5 py-4 text-sm text-cream-50">
+              <p>
+                <span className="font-semibold">
+                  We are temporarily closed.
+                </span>{" "}
+                <span className="text-cream-100/80">
+                  {v.closed_reason || "Komal is taking a short break."}
+                  {v.closed_until && (
+                    <>
+                      {" "}
+                      Reopens{" "}
+                      {new Date(v.closed_until).toLocaleString("en-PK", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                      .
+                    </>
+                  )}
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Announcement banner — whenever a message is set, open or closed. */}
+        <div>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
+            Announcement banner
+          </p>
+          {v.announcement.trim() ? (
+            <div className="overflow-hidden rounded-2xl bg-caramel-500 px-5 py-4 text-sm font-medium text-espresso-900">
+              {v.announcement}
+            </div>
+          ) : (
+            <p className="rounded-2xl border border-dashed border-espresso-200 px-5 py-4 text-xs text-espresso-400">
+              No announcement set — type a message above and it appears
+              here and across the whole site.
+            </p>
+          )}
         </div>
       </aside>
     </div>

@@ -3,6 +3,7 @@ import { Inter, Playfair_Display, Dancing_Script } from "next/font/google";
 import { site } from "@/lib/data/site";
 import CleanPreviewUrl from "@/components/CleanPreviewUrl";
 import ClickEffect from "@/components/ClickEffect";
+import InitialLoader from "@/components/InitialLoader";
 import "./globals.css";
 
 const inter = Inter({
@@ -70,6 +71,7 @@ export default function RootLayout({
         <CleanPreviewUrl />
         {children}
         <ClickEffect />
+        <InitialLoader />
       </body>
     </html>
   );

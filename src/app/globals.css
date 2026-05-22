@@ -160,6 +160,33 @@ html {
   }
 }
 
+/* Hero store-status badge — a soft halo that breathes around the chip:
+   warm green when open, red when closed. */
+@keyframes badgeGlowOpen {
+  0%,
+  100% {
+    box-shadow: 0 0 13px -3px rgba(74, 222, 128, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 26px 2px rgba(74, 222, 128, 0.7);
+  }
+}
+@keyframes badgeGlowClosed {
+  0%,
+  100% {
+    box-shadow: 0 0 13px -3px rgba(248, 113, 113, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 26px 2px rgba(248, 113, 113, 0.7);
+  }
+}
+.badge-glow-open {
+  animation: badgeGlowOpen 2.6s ease-in-out infinite;
+}
+.badge-glow-closed {
+  animation: badgeGlowClosed 2.6s ease-in-out infinite;
+}
+
 /* Floating "View cart" button entrance — springs up from the corner
    when the cart goes from empty to holding its first item. */
 @keyframes fabPopIn {
@@ -198,6 +225,81 @@ html {
 
 .cart-line-in {
   animation: cartLineIn 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* ---------------------------------------------------------------------
+   Coffee-cup loader — used on route transitions and any awaited screen.
+   The cup gently bobs, fresh coffee rises and sloshes inside it, three
+   steam wisps curl up off the rim, and a row of beans pulses below.
+--------------------------------------------------------------------- */
+
+/* Whole cup bobbing on an invisible cushion of steam. */
+@keyframes cupBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Coffee level rising, then sloshing back — `alternate` does the return. */
+@keyframes cupFill {
+  0% {
+    transform: translateY(44px);
+  }
+  100% {
+    transform: translateY(4px);
+  }
+}
+
+/* A steam wisp fading upward off the rim. */
+@keyframes steamRise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  30% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* The three beans below the cup pulsing in sequence. */
+@keyframes loaderBean {
+  0%,
+  70%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.68);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Delayed reveal — the loader stays fully invisible for ~280ms, then
+   fades in. If the real content arrives first (a fast load) the loader
+   is never seen, so there is no flash. Only slow loads ever show it. */
+@keyframes loaderReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.loader-delayed {
+  opacity: 0;
+  animation: loaderReveal 0.22s ease-out 0.28s forwards;
 }
 
 /* Suppress browser-native search input chrome (×, magnifier) so our own
