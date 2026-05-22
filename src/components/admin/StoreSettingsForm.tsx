@@ -12,7 +12,6 @@ export default function StoreSettingsForm({
     is_open: boolean;
     closed_reason: string;
     closed_until: string; // datetime-local value
-    announcement: string;
   };
 }) {
   const router = useRouter();
@@ -31,7 +30,6 @@ export default function StoreSettingsForm({
           ? new Date(v.closed_until).toISOString()
           : null,
         closed_reason: v.closed_reason || null,
-        announcement: v.announcement || null,
       };
       const res = await fetch("/api/admin/store", {
         method: "PUT",
@@ -113,19 +111,11 @@ export default function StoreSettingsForm({
           />
         </Field>
 
-        <Field label="Site-wide announcement (always shown at the top of every page)">
-          <textarea
-            rows={2}
-            value={v.announcement}
-            onChange={(e) => setV({ ...v, announcement: e.target.value })}
-            className="input resize-none"
-            placeholder="E.g. Free delivery this weekend on orders over Rs 1,500!"
-          />
-          <p className="mt-1.5 text-xs text-espresso-400">
-            Appears on a banner across the whole site — open or closed.
-            Leave it empty to remove the banner.
-          </p>
-        </Field>
+        <p className="rounded-xl bg-cream-100/60 px-4 py-3 text-xs text-espresso-500">
+          Looking for the site-wide announcement message? It now has its
+          own page — <span className="font-semibold text-espresso-700">
+          Configuration → Announcement</span>.
+        </p>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -192,22 +182,6 @@ export default function StoreSettingsForm({
           )}
         </div>
 
-        {/* Announcement banner — whenever a message is set, open or closed. */}
-        <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
-            Announcement banner
-          </p>
-          {v.announcement.trim() ? (
-            <div className="overflow-hidden rounded-2xl bg-caramel-500 px-5 py-4 text-sm font-medium text-espresso-900">
-              {v.announcement}
-            </div>
-          ) : (
-            <p className="rounded-2xl border border-dashed border-espresso-200 px-5 py-4 text-xs text-espresso-400">
-              No announcement set — type a message above and it appears
-              here and across the whole site.
-            </p>
-          )}
-        </div>
       </aside>
     </div>
   );

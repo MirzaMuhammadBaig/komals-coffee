@@ -8,6 +8,7 @@ import {
   FolderTree,
   Star,
   Mail,
+  Megaphone,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
@@ -50,6 +51,13 @@ export const adminNavSections: AdminNavSection[] = [
   },
   {
     heading: "Configuration",
-    items: [{ href: "/admin/store", label: "Store status", icon: Store }],
+    items: [
+      { href: "/admin/store", label: "Store status", icon: Store },
+      {
+        href: "/admin/announcement",
+        label: "Announcement",
+        icon: Megaphone,
+      },
+    ],
   },
 ];

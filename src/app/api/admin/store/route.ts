@@ -15,6 +15,9 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  // NOTE: this endpoint never touches `announcement` — that column is
+  // owned solely by /api/admin/announcement, so saving the store status
+  // can never clear the site-wide banner.
   const supabase = createSupabaseServiceClient();
   const { error } = await supabase
     .from("store_settings")
@@ -27,10 +30,6 @@ export async function PUT(req: Request) {
       closed_until:
         typeof body.closed_until === "string" && body.closed_until
           ? body.closed_until
-          : null,
-      announcement:
-        typeof body.announcement === "string" && body.announcement
-          ? body.announcement
           : null,
       updated_at: new Date().toISOString(),
     })

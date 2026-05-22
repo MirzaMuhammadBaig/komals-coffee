@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import FloatingOrderButton from "@/components/FloatingOrderButton";
 import CartDrawer from "@/components/CartDrawer";
 import StoreClosedBanner from "@/components/StoreClosedBanner";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { CartProvider } from "@/lib/cart/CartContext";
 import { getStoreSettings } from "@/lib/admin/store";
 import { isWithinOrderHours, getNextOpening } from "@/lib/hours";
@@ -56,10 +57,8 @@ export default async function SiteLayout({
 
   return (
     <CartProvider>
-      {isClosed && <StoreClosedBanner message={closedMessage} tone="warn" />}
-      {store?.announcement && (
-        <StoreClosedBanner message={store.announcement} tone="info" />
-      )}
+      <AnnouncementBanner message={store?.announcement ?? null} />
+      {isClosed && <StoreClosedBanner message={closedMessage} />}
       <Navbar />
       <main className="min-h-[60vh]">{children}</main>
       <Footer />

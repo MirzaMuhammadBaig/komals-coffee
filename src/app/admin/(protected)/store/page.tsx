@@ -24,7 +24,6 @@ export default async function AdminStorePage() {
           is_open: store?.is_open ?? true,
           closed_reason: store?.closed_reason ?? "",
           closed_until: toLocalInput(store?.closed_until),
-          announcement: store?.announcement ?? "",
         }}
       />
     </div>
