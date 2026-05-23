@@ -22,15 +22,15 @@ export default function MenuPage() {
         <MenuExplorer />
       </Suspense>
 
-      <section className="bg-cream-100/40 py-14 sm:py-20">
+      <section className="bg-cream-100/40 py-12 sm:py-20">
         <div className="container-base">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          <div className="grid gap-8 sm:gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
             <div>
               <p className="eyebrow">About this menu</p>
-              <h2 className="mt-3 font-display text-3xl text-espresso-800 sm:text-4xl">
+              <h2 className="mt-2 font-display text-2xl text-espresso-800 sm:mt-3 sm:text-3xl lg:text-4xl">
                 Made fresh, made for you.
               </h2>
-              <p className="mt-4 text-espresso-600">
+              <p className="mt-3 text-sm text-espresso-600 sm:mt-4 sm:text-base">
                 Every drink is built to order by Komal. Prices in PKR, default
                 16oz where applicable. Milk substitutions, sweetness, and shot
                 count are all adjustable. Just leave a note with your order.

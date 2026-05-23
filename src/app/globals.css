@@ -53,7 +53,15 @@ html {
 
 @layer components {
   .container-base {
-    @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Belt-and-braces: prevent any descendant from horizontally
+     overflowing the viewport on small phones (320px) — the most common
+     cause of the dreaded sideways-scroll. */
+  html,
+  body {
+    @apply overflow-x-hidden;
   }
 
   .btn-base {

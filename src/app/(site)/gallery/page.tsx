@@ -21,15 +21,17 @@ export default function GalleryPage() {
 
       <section className="section">
         <div className="container-base">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
             {gallery.map((g, i) => (
               <figure
                 key={i}
                 className={
+                  // Only apply the tall masonry tile on md+ so mobile stays
+                  // a clean 2-col grid of equal squares with no overflow.
                   (i % 5 === 0
-                    ? "relative col-span-1 row-span-2 aspect-[3/4] md:col-span-1 "
+                    ? "relative aspect-square md:col-span-1 md:row-span-2 md:aspect-[3/4] "
                     : "relative aspect-square ") +
-                  "group cursor-zoom-in overflow-hidden rounded-3xl bg-espresso-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:ring-2 hover:ring-caramel-400/40 active:scale-[0.99]"
+                  "group cursor-zoom-in overflow-hidden rounded-2xl bg-espresso-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:ring-2 hover:ring-caramel-400/40 active:scale-[0.99] sm:rounded-3xl"
                 }
               >
                 <SafeImage
@@ -37,7 +39,7 @@ export default function GalleryPage() {
                   alt={g.alt}
                   fill
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 33vw, 50vw"
                   iconOnly
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-espresso-900/70 via-espresso-900/0 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

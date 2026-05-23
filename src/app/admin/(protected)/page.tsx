@@ -151,9 +151,9 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Stat cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => {
           const Wrapper = s.href
             ? ({ children }: { children: React.ReactNode }) => (
@@ -185,10 +185,10 @@ export default async function AdminDashboardPage() {
                   <ArrowUpRight className="h-4 w-4 text-espresso-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 )}
               </div>
-              <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
+              <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-espresso-400 sm:mt-5 sm:text-[11px] sm:tracking-[0.2em]">
                 {s.label}
               </p>
-              <p className="mt-1 font-display text-3xl text-espresso-800 tabular-nums">
+              <p className="mt-1 break-words font-display text-2xl text-espresso-800 tabular-nums sm:text-3xl">
                 {s.value}
               </p>
             </Wrapper>
@@ -196,19 +196,19 @@ export default async function AdminDashboardPage() {
         })}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Recent orders */}
         <section className="card lg:col-span-2">
-          <header className="flex items-center justify-between border-b border-espresso-100 px-5 py-4 sm:px-6">
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-espresso-100 px-4 py-4 sm:px-6">
             <div>
               <p className="eyebrow">Recent activity</p>
-              <h2 className="mt-1 font-display text-lg text-espresso-800">
+              <h2 className="mt-1 font-display text-base text-espresso-800 sm:text-lg">
                 Latest orders
               </h2>
             </div>
             <Link
               href="/admin/orders"
-              className="link-underline text-xs font-semibold uppercase tracking-[0.2em] text-espresso-600 hover:text-caramel-700"
+              className="link-underline text-[11px] font-semibold uppercase tracking-[0.18em] text-espresso-600 hover:text-caramel-700 sm:text-xs sm:tracking-[0.2em]"
             >
               View all →
             </Link>
@@ -223,11 +223,11 @@ export default async function AdminDashboardPage() {
                 <li key={o.id}>
                   <Link
                     href={`/admin/orders/${o.id}`}
-                    className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-cream-100/60 sm:px-6"
+                    className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-cream-100/60 sm:gap-4 sm:px-6"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="truncate font-display text-base text-espresso-800">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p className="truncate font-display text-sm text-espresso-800 sm:text-base">
                           {o.name}
                         </p>
                         <StatusBadge status={o.status} />
@@ -240,8 +240,8 @@ export default async function AdminDashboardPage() {
                         {(o.items?.length ?? 0) > 3 ? "…" : ""}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-espresso-800 tabular-nums">
+                    <div className="shrink-0 text-right">
+                      <p className="text-sm font-semibold text-espresso-800 tabular-nums sm:text-base">
                         {formatPkr(o.total_pkr ?? 0)}
                       </p>
                       <p className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-espresso-400">

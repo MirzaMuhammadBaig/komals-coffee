@@ -20,15 +20,15 @@ export default async function OrderPage() {
     <>
       <section
         id="order-form"
-        className="bg-cream-100/40 pb-14 pt-12 sm:pb-20 sm:pt-16 lg:pt-20"
+        className="bg-cream-100/40 pb-12 pt-10 sm:pb-20 sm:pt-16 lg:pt-20"
       >
         <div className="container-base">
           <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">Build your order</p>
-            <h2 className="mt-3 font-display text-3xl text-espresso-800 sm:text-4xl lg:text-5xl">
+            <h2 className="mt-2 font-display text-2xl text-espresso-800 sm:mt-3 sm:text-3xl lg:text-5xl">
               Tap to add. We will handle the rest.
             </h2>
-            <p className="mt-4 text-espresso-600">
+            <p className="mt-3 text-sm text-espresso-600 sm:mt-4 sm:text-base">
               Add your drinks, fill in your address, and Komal will WhatsApp you
               within minutes to confirm timing and payment.
             </p>
@@ -85,7 +85,7 @@ export default async function OrderPage() {
             )}
           </div>
 
-          <div className="mt-12 grid gap-4 rounded-3xl bg-white p-5 ring-1 ring-espresso-100 sm:grid-cols-3 sm:p-8">
+          <div className="mt-10 grid gap-4 rounded-3xl bg-white p-5 ring-1 ring-espresso-100 sm:mt-12 sm:grid-cols-3 sm:p-8">
             <div>
               <p className="eyebrow">Delivery</p>
               <p className="mt-2 text-sm text-espresso-600">

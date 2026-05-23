@@ -58,7 +58,7 @@ export default function MenuItemPage({ params }: Props) {
       </section>
 
       <section className="section">
-        <div className="container-base grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="container-base grid items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="group relative aspect-square overflow-hidden rounded-3xl bg-espresso-100 ring-1 ring-espresso-100 transition-shadow duration-500 hover:shadow-2xl">
             <SafeImage
               src={item.image}
@@ -70,12 +70,12 @@ export default function MenuItemPage({ params }: Props) {
               iconOnly
             />
             {item.signature && (
-              <span className="badge absolute left-5 top-5 bg-caramel-500 text-espresso-900 shadow-md">
+              <span className="badge absolute left-4 top-4 bg-caramel-500 text-espresso-900 shadow-md sm:left-5 sm:top-5">
                 Signature
               </span>
             )}
             {!item.signature && item.bestseller && (
-              <span className="badge absolute left-5 top-5 bg-espresso-700 text-cream-50 shadow-md">
+              <span className="badge absolute left-4 top-4 bg-espresso-700 text-cream-50 shadow-md sm:left-5 sm:top-5">
                 Bestseller
               </span>
             )}
@@ -83,26 +83,26 @@ export default function MenuItemPage({ params }: Props) {
 
           <div>
             <p className="eyebrow">{category?.name ?? "Drink"}</p>
-            <h1 className="mt-3 font-display text-4xl text-espresso-800 sm:text-5xl">
+            <h1 className="mt-2 font-display text-3xl text-espresso-800 sm:mt-3 sm:text-4xl lg:text-5xl">
               {item.name}
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-espresso-600">
+            <p className="mt-4 text-base leading-relaxed text-espresso-600 sm:mt-5 sm:text-lg">
               {item.description}
             </p>
 
-            <div className="mt-7 flex items-baseline gap-4">
-              <span className="font-display text-4xl text-espresso-800">
+            <div className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-1 sm:mt-7">
+              <span className="font-display text-3xl text-espresso-800 sm:text-4xl">
                 {formatPkr(item.price)}
               </span>
               {item.size && (
-                <span className="text-xs uppercase tracking-[0.2em] text-espresso-400">
+                <span className="text-[11px] uppercase tracking-[0.2em] text-espresso-400 sm:text-xs">
                   {item.size}
                 </span>
               )}
             </div>
 
             {item.tags && item.tags.length > 0 && (
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
                 {item.tags.map((t) => (
                   <span
                     key={t}
@@ -114,7 +114,7 @@ export default function MenuItemPage({ params }: Props) {
               </div>
             )}
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
+            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
               <AddToCartButton
                 slug={item.slug}
                 name={item.name}
@@ -124,7 +124,7 @@ export default function MenuItemPage({ params }: Props) {
               <GoToCheckoutButton slug={item.slug} />
             </div>
 
-            <dl className="mt-12 grid gap-5 border-t border-espresso-100 pt-8 sm:grid-cols-3">
+            <dl className="mt-10 grid gap-4 border-t border-espresso-100 pt-6 sm:mt-12 sm:grid-cols-3 sm:gap-5 sm:pt-8">
               <div>
                 <dt className="text-xs uppercase tracking-[0.2em] text-espresso-400">
                   Made-to-order
@@ -155,12 +155,12 @@ export default function MenuItemPage({ params }: Props) {
       </section>
 
       {related.length > 0 && (
-        <section className="bg-cream-100/40 py-14 sm:py-20">
+        <section className="bg-cream-100/40 py-12 sm:py-20">
           <div className="container-base">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
               <div>
                 <p className="eyebrow">More from this category</p>
-                <h2 className="mt-3 font-display text-3xl text-espresso-800 sm:text-4xl">
+                <h2 className="mt-2 font-display text-2xl text-espresso-800 sm:mt-3 sm:text-3xl lg:text-4xl">
                   You might also like
                 </h2>
               </div>
@@ -172,14 +172,14 @@ export default function MenuItemPage({ params }: Props) {
               </Link>
             </div>
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid gap-5 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {related.map((r) => (
                 <Link
                   key={r.slug}
                   href={`/menu/${r.slug}`}
                   className="card-hoverable group block overflow-hidden active:scale-[0.99]"
                 >
-                  <div className="relative h-48 w-full overflow-hidden">
+                  <div className="relative h-40 w-full overflow-hidden sm:h-48">
                     <SafeImage
                       src={r.image}
                       alt={r.name}

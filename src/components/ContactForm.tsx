@@ -78,9 +78,9 @@ export default function ContactForm() {
     <form
       onSubmit={onSubmit}
       aria-label="Contact form"
-      className="card grid gap-5 p-6 sm:p-8 lg:p-10"
+      className="card grid gap-4 p-5 sm:gap-5 sm:p-6 lg:p-10"
     >
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
         <div>
           <label
             htmlFor={`${id}-name`}
@@ -122,7 +122,7 @@ export default function ContactForm() {
         </div>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
         <div>
           <label
             htmlFor={`${id}-phone`}
@@ -194,7 +194,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={state === "loading"}
-          className="group inline-flex items-center justify-center gap-2 rounded-full bg-espresso-700 px-5 py-2.5 text-sm font-semibold text-cream-50 shadow-[0_8px_20px_-8px_rgba(40,24,15,0.55)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-espresso-800 hover:shadow-[0_14px_28px_-12px_rgba(40,24,15,0.55)] active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-espresso-700 px-5 py-3 text-sm font-semibold text-cream-50 shadow-[0_8px_20px_-8px_rgba(40,24,15,0.55)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-espresso-800 hover:shadow-[0_14px_28px_-12px_rgba(40,24,15,0.55)] active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2.5"
         >
           {state === "loading" ? (
             <>

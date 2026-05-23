@@ -14,22 +14,22 @@ import { whatsappLink } from "@/lib/utils";
 
 export default function Footer() {
   return (
-    <footer className="mt-20 bg-espresso-800 text-cream-100">
-      <div className="container-base grid gap-12 py-16 md:grid-cols-4">
+    <footer className="mt-16 bg-espresso-800 text-cream-100 sm:mt-20">
+      <div className="container-base grid gap-10 py-12 sm:grid-cols-2 sm:gap-12 sm:py-14 lg:grid-cols-4 lg:py-16">
         <div>
           <Link
             href="/"
             className="group flex items-center gap-2 font-display text-2xl font-bold text-cream-50 transition-transform duration-300 hover:-translate-y-0.5"
           >
             <Coffee
-              className="h-7 w-7 text-caramel-400 transition-transform duration-500 group-hover:rotate-[14deg]"
+              className="h-7 w-7 shrink-0 text-caramel-400 transition-transform duration-500 group-hover:rotate-[14deg]"
               strokeWidth={1.6}
             />
             <span className="flex flex-col leading-none">
-              <span className="font-script text-3xl text-caramel-400 transition-colors group-hover:text-caramel-300">
+              <span className="font-script text-2xl text-caramel-400 transition-colors group-hover:text-caramel-300 sm:text-3xl">
                 Komal&apos;s
               </span>
-              <span className="-mt-1 text-[11px] uppercase tracking-[0.35em] text-cream-100/70">
+              <span className="-mt-1 text-[10px] uppercase tracking-[0.3em] text-cream-100/70 sm:text-[11px] sm:tracking-[0.35em]">
                 Coffee
               </span>
             </span>
@@ -43,7 +43,7 @@ export default function Footer() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label="Instagram"
-              className="group rounded-full border border-cream-100/20 p-2 transition-all duration-300 hover:-translate-y-1 hover:border-caramel-400 hover:bg-caramel-400/10 hover:text-caramel-400 hover:shadow-lg hover:shadow-caramel-400/20 active:scale-90"
+              className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream-100/20 transition-all duration-300 hover:-translate-y-1 hover:border-caramel-400 hover:bg-caramel-400/10 hover:text-caramel-400 hover:shadow-lg hover:shadow-caramel-400/20 active:scale-90"
             >
               <Instagram className="h-4 w-4 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110" />
             </a>
@@ -52,7 +52,7 @@ export default function Footer() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label="Facebook"
-              className="group rounded-full border border-cream-100/20 p-2 transition-all duration-300 hover:-translate-y-1 hover:border-caramel-400 hover:bg-caramel-400/10 hover:text-caramel-400 hover:shadow-lg hover:shadow-caramel-400/20 active:scale-90"
+              className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream-100/20 transition-all duration-300 hover:-translate-y-1 hover:border-caramel-400 hover:bg-caramel-400/10 hover:text-caramel-400 hover:shadow-lg hover:shadow-caramel-400/20 active:scale-90"
             >
               <Facebook className="h-4 w-4 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
             </a>
@@ -61,7 +61,7 @@ export default function Footer() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label="WhatsApp"
-              className="group rounded-full border border-cream-100/20 p-2 transition-all duration-300 hover:-translate-y-1 hover:border-caramel-400 hover:bg-caramel-400/10 hover:text-caramel-400 hover:shadow-lg hover:shadow-caramel-400/20 active:scale-90"
+              className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-cream-100/20 transition-all duration-300 hover:-translate-y-1 hover:border-caramel-400 hover:bg-caramel-400/10 hover:text-caramel-400 hover:shadow-lg hover:shadow-caramel-400/20 active:scale-90"
             >
               <MessageCircle className="h-4 w-4 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110" />
             </a>

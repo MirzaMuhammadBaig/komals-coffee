@@ -21,20 +21,20 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-espresso-100/60 bg-cream-50/85 backdrop-blur transition-shadow hover:shadow-sm">
-      <div className="container-base flex h-20 items-center justify-between">
+      <div className="container-base flex h-16 items-center justify-between sm:h-20">
         <Link
           href="/"
-          className="group flex shrink-0 items-center gap-2 font-display text-2xl font-bold text-espresso-700 transition-transform duration-300 hover:-translate-y-0.5 active:scale-95"
+          className="group flex min-w-0 shrink items-center gap-2 font-display text-2xl font-bold text-espresso-700 transition-transform duration-300 hover:-translate-y-0.5 active:scale-95"
         >
           <Coffee
-            className="h-6 w-6 text-caramel-500 transition-transform duration-500 group-hover:rotate-[14deg] sm:h-7 sm:w-7"
+            className="h-6 w-6 shrink-0 text-caramel-500 transition-transform duration-500 group-hover:rotate-[14deg] sm:h-7 sm:w-7"
             strokeWidth={1.6}
           />
-          <span className="flex flex-col leading-none">
-            <span className="font-script text-xl text-caramel-600 transition-colors group-hover:text-caramel-500 sm:text-2xl">
+          <span className="flex min-w-0 flex-col leading-none">
+            <span className="truncate font-script text-lg text-caramel-600 transition-colors group-hover:text-caramel-500 sm:text-2xl">
               Komal&apos;s
             </span>
-            <span className="-mt-1 text-[10px] uppercase tracking-[0.3em] text-espresso-500 transition-colors group-hover:text-espresso-700 sm:text-[11px] sm:tracking-[0.35em]">
+            <span className="-mt-1 truncate text-[9px] uppercase tracking-[0.28em] text-espresso-500 transition-colors group-hover:text-espresso-700 sm:text-[11px] sm:tracking-[0.35em]">
               Coffee
             </span>
           </span>
@@ -66,7 +66,7 @@ export default function Navbar() {
 
         <button
           aria-label="Toggle navigation"
-          className="rounded-full p-2 text-espresso-700 transition-all duration-200 hover:bg-cream-100 active:scale-90 md:hidden"
+          className="-mr-1.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-espresso-700 transition-all duration-200 hover:bg-cream-100 active:scale-90 md:hidden"
           onClick={() => setOpen((o) => !o)}
         >
           <span

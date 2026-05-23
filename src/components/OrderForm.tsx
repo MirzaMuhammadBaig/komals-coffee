@@ -158,12 +158,12 @@ export default function OrderForm() {
 
   return (
     <>
-    <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:gap-8">
-      <div>
+    <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1.2fr_1fr] lg:gap-8">
+      <div className="min-w-0">
         <div className="card overflow-hidden">
-          <div className="border-b border-espresso-100 bg-cream-100/50 px-5 py-4 sm:px-6">
+          <div className="border-b border-espresso-100 bg-cream-100/50 px-4 py-4 sm:px-6">
             <p className="eyebrow">Step 1</p>
-            <h3 className="mt-1 font-display text-lg text-espresso-800 sm:text-xl">
+            <h3 className="mt-1 font-display text-base text-espresso-800 sm:text-xl">
               Pick your drinks
             </h3>
 
@@ -336,7 +336,7 @@ export default function OrderForm() {
       <form
         onSubmit={onSubmit}
         id="checkout-details"
-        className="card flex scroll-mt-24 flex-col gap-5 p-6 sm:p-8"
+        className="card flex min-w-0 scroll-mt-20 flex-col gap-4 p-5 sm:scroll-mt-24 sm:gap-5 sm:p-6 lg:p-8"
       >
         <div>
           <p className="eyebrow">Step 2</p>

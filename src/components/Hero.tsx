@@ -40,13 +40,13 @@ export default async function Hero() {
 
       <CoffeeDecorations />
 
-      <div className="container-base relative grid min-h-[88vh] items-center py-20 sm:min-h-[90vh] sm:py-24 lg:min-h-[92vh] lg:py-28">
+      <div className="container-base relative grid min-h-[80vh] items-center py-16 sm:min-h-[88vh] sm:py-20 lg:min-h-[92vh] lg:py-28">
         <div className="max-w-3xl">
           {/* Live store-status chip — re-checks the clock client-side */}
           <StoreStatusBadge manualOpen={manualOpen} initial={initialStatus} />
 
-          <h1 className="font-display text-4xl leading-[1.05] text-cream-50 sm:text-6xl lg:text-7xl">
-            <span className="font-script block pb-1 text-5xl leading-[0.95] text-caramel-400 transition-colors duration-500 hover:text-caramel-300 sm:text-7xl lg:text-8xl">
+          <h1 className="font-display text-3xl leading-[1.08] text-cream-50 sm:text-5xl md:text-6xl lg:text-7xl">
+            <span className="font-script block pb-1 text-4xl leading-[0.95] text-caramel-400 transition-colors duration-500 hover:text-caramel-300 sm:text-6xl md:text-7xl lg:text-8xl">
               Komal&apos;s
             </span>
             hand-crafted
@@ -57,8 +57,8 @@ export default async function Hero() {
           </h1>
 
           {/* Rotating "today's craving" line */}
-          <div className="mt-5 flex flex-wrap items-baseline gap-x-2 text-sm text-cream-100/70 sm:text-base">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-caramel-400">
+          <div className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm text-cream-100/70 sm:mt-5 sm:text-base">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-caramel-400 sm:text-[11px] sm:tracking-[0.25em]">
               Today&apos;s craving:
             </span>
             <AnimatedTagline
@@ -73,7 +73,7 @@ export default async function Hero() {
             />
           </div>
 
-          <p className="mt-5 max-w-xl text-base text-cream-100/85 sm:mt-6 sm:text-lg lg:text-xl">
+          <p className="mt-4 max-w-xl text-sm text-cream-100/85 sm:mt-6 sm:text-base lg:text-xl">
             One barista. One kitchen. One promise. Frothy, creamy,
             made-to-order specialty coffee. Rated{" "}
             <span className="font-semibold text-cream-50">
@@ -99,12 +99,12 @@ export default async function Hero() {
           </div>
 
           {/* Three stat counters — aggregate across Google + foodpanda */}
-          <dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-cream-100/15 pt-6 sm:mt-12 sm:gap-6 sm:pt-8">
+          <dl className="mt-8 grid max-w-md grid-cols-3 gap-3 border-t border-cream-100/15 pt-5 sm:mt-12 sm:gap-6 sm:pt-8">
             <div>
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-100/60">
+              <dt className="text-[9px] font-semibold uppercase tracking-[0.18em] text-cream-100/60 sm:text-[10px] sm:tracking-[0.2em]">
                 Avg rating
               </dt>
-              <dd className="mt-1 flex items-baseline gap-1 font-display text-xl text-cream-50 sm:text-2xl lg:text-3xl">
+              <dd className="mt-1 flex items-baseline gap-1 font-display text-lg text-cream-50 sm:text-2xl lg:text-3xl">
                 <AnimatedCounter
                   to={reviewSummary.averageRating}
                   decimals={1}
@@ -114,10 +114,10 @@ export default async function Hero() {
               </dd>
             </div>
             <div>
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-100/60">
+              <dt className="text-[9px] font-semibold uppercase tracking-[0.18em] text-cream-100/60 sm:text-[10px] sm:tracking-[0.2em]">
                 Reviews
               </dt>
-              <dd className="mt-1 font-display text-xl text-cream-50 sm:text-2xl lg:text-3xl">
+              <dd className="mt-1 font-display text-lg text-cream-50 sm:text-2xl lg:text-3xl">
                 <AnimatedCounter
                   to={reviewSummary.totalCount}
                   duration={1600}
@@ -126,10 +126,10 @@ export default async function Hero() {
               </dd>
             </div>
             <div>
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-100/60">
+              <dt className="text-[9px] font-semibold uppercase tracking-[0.18em] text-cream-100/60 sm:text-[10px] sm:tracking-[0.2em]">
                 Delivery
               </dt>
-              <dd className="mt-1 font-display text-xl text-cream-50 sm:text-2xl lg:text-3xl">
+              <dd className="mt-1 font-display text-lg text-cream-50 sm:text-2xl lg:text-3xl">
                 <AnimatedCounter
                   to={30}
                   duration={1500}

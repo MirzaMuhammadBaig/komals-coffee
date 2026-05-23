@@ -9,13 +9,13 @@ export default function InstagramTease() {
   return (
     <section className="section">
       <div className="container-base">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div className="flex flex-col items-start justify-between gap-4 sm:gap-6 md:flex-row md:items-end">
           <div className="max-w-xl">
             <p className="eyebrow">From the gram</p>
-            <h2 className="mt-4 font-display text-4xl text-espresso-800 sm:text-5xl">
+            <h2 className="mt-3 break-words font-display text-3xl text-espresso-800 sm:mt-4 sm:text-4xl lg:text-5xl">
               {site.social.instagramHandle}
             </h2>
-            <p className="mt-4 text-espresso-600">
+            <p className="mt-3 text-sm text-espresso-600 sm:mt-4 sm:text-base">
               {site.stats.instagramFollowers} coffee lovers and counting. Tag us
               in your shots. Our favourites land on the feed.
             </p>
@@ -24,14 +24,14 @@ export default function InstagramTease() {
             href={site.social.instagram}
             target="_blank"
             rel="noreferrer noopener"
-            className="btn-primary"
+            className="btn-primary w-full sm:w-auto"
           >
             <Instagram className="mr-2 h-4 w-4" />
             Follow on Instagram
           </a>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:grid-cols-3 lg:grid-cols-6">
           {tiles.map((g, i) => (
             <a
               key={i}

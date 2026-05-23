@@ -9,13 +9,13 @@ export default function PageHeader({
 }) {
   return (
     <section className="border-b border-espresso-100 bg-cream-100/60">
-      <div className="container-base py-14 sm:py-20 lg:py-28">
+      <div className="container-base py-10 sm:py-16 lg:py-28">
         <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-4 font-display text-4xl text-espresso-800 sm:text-5xl lg:text-6xl">
+        <h1 className="mt-3 font-display text-3xl text-espresso-800 sm:mt-4 sm:text-4xl md:text-5xl lg:text-6xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-5 max-w-2xl text-base text-espresso-600 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-sm text-espresso-600 sm:mt-5 sm:text-base lg:text-lg">
             {description}
           </p>
         )}

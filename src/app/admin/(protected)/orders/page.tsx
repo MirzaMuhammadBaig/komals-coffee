@@ -43,8 +43,8 @@ export default async function AdminOrdersPage({
       />
 
       {/* Filters */}
-      <div className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-1.5">
+      <div className="card flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+        <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
           {STATUS_FILTERS.map((f) => {
             const active = status === f.value;
             const params = new URLSearchParams();
@@ -56,7 +56,7 @@ export default async function AdminOrdersPage({
                 key={f.value}
                 href={href}
                 className={cn(
-                  "rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] transition-all duration-150",
+                  "shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] transition-all duration-150 sm:shrink",
                   active
                     ? "bg-espresso-700 text-cream-50 shadow-sm"
                     : "bg-cream-100 text-espresso-600 hover:bg-cream-200 hover:text-espresso-800",
@@ -76,7 +76,7 @@ export default async function AdminOrdersPage({
             name="q"
             defaultValue={q}
             placeholder="Search name or phone"
-            className="input h-9 w-56 py-1 text-sm"
+            className="input h-9 w-full py-1 text-sm sm:w-56"
           />
         </form>
       </div>
@@ -97,7 +97,7 @@ export default async function AdminOrdersPage({
         </div>
       ) : (
         <div className="card overflow-hidden">
-          <div className="hidden grid-cols-[1.5fr_2fr_1fr_1fr_1fr_auto] gap-4 border-b border-espresso-100 bg-cream-100/50 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-espresso-500 md:grid">
+          <div className="hidden grid-cols-[1.5fr_2fr_1fr_1fr_1fr_auto] gap-4 border-b border-espresso-100 bg-cream-100/50 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-espresso-500 lg:grid">
             <span>Customer</span>
             <span>Items</span>
             <span>Total</span>
@@ -111,14 +111,14 @@ export default async function AdminOrdersPage({
                 {/* Mobile: card-style layout. Desktop: 6-column grid. */}
                 <Link
                   href={`/admin/orders/${o.id}`}
-                  className="block px-4 py-4 transition-colors hover:bg-cream-100/60 sm:px-5 md:grid md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr_auto] md:items-center md:gap-4"
+                  className="block px-4 py-4 transition-colors hover:bg-cream-100/60 sm:px-5 lg:grid lg:grid-cols-[1.5fr_2fr_1fr_1fr_1fr_auto] lg:items-center lg:gap-4"
                 >
-                  <div className="flex items-start justify-between gap-3 md:block">
+                  <div className="flex items-start justify-between gap-3 lg:block">
                     <div className="min-w-0">
-                      <p className="truncate font-display text-base text-espresso-800">
+                      <p className="truncate font-display text-sm text-espresso-800 sm:text-base">
                         {o.name}
                       </p>
-                      <p className="truncate text-xs text-espresso-400">
+                      <p className="truncate text-[11px] text-espresso-400 sm:text-xs">
                         {new Date(o.created_at).toLocaleString("en-PK", {
                           month: "short",
                           day: "numeric",
@@ -128,13 +128,13 @@ export default async function AdminOrdersPage({
                         · {o.phone}
                       </p>
                     </div>
-                    {/* Mobile only: status next to name */}
-                    <span className="shrink-0 md:hidden">
+                    {/* Mobile/tablet only: status next to name */}
+                    <span className="shrink-0 lg:hidden">
                       <StatusBadge status={o.status} />
                     </span>
                   </div>
 
-                  <p className="mt-2 truncate text-xs text-espresso-600 md:mt-0">
+                  <p className="mt-2 line-clamp-2 break-words text-xs text-espresso-600 lg:mt-0 lg:truncate">
                     {(
                       (o.items as { name?: string; qty?: number }[]) ?? []
                     )
@@ -142,8 +142,8 @@ export default async function AdminOrdersPage({
                       .join(" · ")}
                   </p>
 
-                  {/* Mobile only: bottom row with price + payment */}
-                  <div className="mt-2 flex items-center justify-between text-xs md:hidden">
+                  {/* Mobile/tablet only: bottom row with price + payment */}
+                  <div className="mt-2 flex items-center justify-between text-xs lg:hidden">
                     <span className="text-[11px] uppercase tracking-[0.15em] text-espresso-500">
                       {o.payment_method === "card" ? "Card" : "COD"}
                       {o.payment_status === "paid" && (
@@ -159,10 +159,10 @@ export default async function AdminOrdersPage({
                   </div>
 
                   {/* Desktop only: spread into columns */}
-                  <p className="hidden font-semibold tabular-nums text-espresso-800 md:block">
+                  <p className="hidden font-semibold tabular-nums text-espresso-800 lg:block">
                     {formatPkr(o.total_pkr ?? 0)}
                   </p>
-                  <p className="hidden text-[11px] uppercase tracking-[0.15em] text-espresso-500 md:block">
+                  <p className="hidden text-[11px] uppercase tracking-[0.15em] text-espresso-500 lg:block">
                     {o.payment_method === "card" ? "Card" : "COD"}
                     {o.payment_status === "paid" && (
                       <span className="ml-1 text-green-600">· Paid</span>
@@ -171,10 +171,10 @@ export default async function AdminOrdersPage({
                       <span className="ml-1 text-red-600">· Failed</span>
                     )}
                   </p>
-                  <span className="hidden md:block">
+                  <span className="hidden lg:block">
                     <StatusBadge status={o.status} />
                   </span>
-                  <span className="hidden text-xs text-espresso-300 md:block">
+                  <span className="hidden text-xs text-espresso-300 lg:block">
                     →
                   </span>
                 </Link>

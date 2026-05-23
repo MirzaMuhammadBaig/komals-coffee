@@ -16,26 +16,26 @@ export default function OrderSuccessPage() {
   }, [clear]);
 
   return (
-    <section className="bg-cream-100/40 py-20 sm:py-28">
+    <section className="bg-cream-100/40 py-12 sm:py-20 lg:py-28">
       <div className="container-base">
         <div className="card mx-auto max-w-2xl overflow-hidden">
-          <div className="bg-gradient-to-br from-caramel-500 via-caramel-600 to-caramel-700 px-8 py-10 text-center text-cream-50 sm:px-12 sm:py-14">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cream-50/15 ring-2 ring-cream-50/30">
-              <Check className="h-8 w-8" />
+          <div className="bg-gradient-to-br from-caramel-500 via-caramel-600 to-caramel-700 px-5 py-8 text-center text-cream-50 sm:px-12 sm:py-14">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-cream-50/15 ring-2 ring-cream-50/30 sm:h-16 sm:w-16">
+              <Check className="h-7 w-7 sm:h-8 sm:w-8" />
             </div>
-            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.3em] text-cream-100/80">
+            <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-cream-100/80 sm:mt-5 sm:text-xs sm:tracking-[0.3em]">
               Payment successful
             </p>
-            <h1 className="mt-3 font-display text-3xl sm:text-4xl">
+            <h1 className="mt-2 font-display text-2xl sm:mt-3 sm:text-3xl lg:text-4xl">
               Thank you for ordering!
             </h1>
-            <p className="mx-auto mt-4 max-w-md text-sm text-cream-100/90">
+            <p className="mx-auto mt-3 max-w-md text-sm text-cream-100/90 sm:mt-4">
               Your payment has been received. Komal will WhatsApp you within
               minutes to confirm timing and start preparing your drinks.
             </p>
           </div>
 
-          <div className="space-y-5 px-8 py-8 sm:px-12 sm:py-10">
+          <div className="space-y-5 px-5 py-6 sm:px-12 sm:py-10">
             <ol className="space-y-4 text-sm text-espresso-700">
               <li className="flex gap-3">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-caramel-500/15 text-xs font-bold text-caramel-700">
@@ -72,7 +72,7 @@ export default function OrderSuccessPage() {
               </li>
             </ol>
 
-            <div className="flex flex-wrap gap-3 pt-3">
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:pt-3">
               <a
                 href={whatsappLink(
                   site.contact.whatsapp,
@@ -80,11 +80,11 @@ export default function OrderSuccessPage() {
                 )}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="btn-whatsapp"
+                className="btn-whatsapp w-full sm:w-auto"
               >
                 <MessageCircle className="mr-2 h-4 w-4" /> Message Komal
               </a>
-              <Link href="/menu" className="btn-ghost">
+              <Link href="/menu" className="btn-ghost w-full sm:w-auto">
                 <ShoppingBag className="mr-2 h-4 w-4" /> Browse menu again
               </Link>
             </div>

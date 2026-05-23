@@ -74,7 +74,7 @@ export default function MoodPicker() {
           </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
           {moods.map((m, i) => (
             <Reveal
               key={m.title}
@@ -84,7 +84,7 @@ export default function MoodPicker() {
             >
               <Link
                 href={`/menu/${m.drinkSlug}`}
-                className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br ${m.gradient} p-6 text-cream-50 shadow-[0_20px_60px_-30px_rgba(58,36,23,0.45)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_80px_-30px_rgba(58,36,23,0.65)] active:translate-y-0 active:scale-[0.98]`}
+                className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br ${m.gradient} p-5 text-cream-50 shadow-[0_20px_60px_-30px_rgba(58,36,23,0.45)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_80px_-30px_rgba(58,36,23,0.65)] active:translate-y-0 active:scale-[0.98] sm:p-6`}
               >
                 {/* Decorative blob */}
                 <span
@@ -94,22 +94,24 @@ export default function MoodPicker() {
                 {/* Watermark emoji */}
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -bottom-3 right-2 text-6xl leading-none opacity-20 transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 group-hover:opacity-40 sm:-bottom-2 sm:right-3 sm:text-7xl"
+                  className="pointer-events-none absolute -bottom-3 right-2 text-5xl leading-none opacity-20 transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 group-hover:opacity-40 sm:-bottom-2 sm:right-3 sm:text-7xl"
                 >
                   {m.emoji}
                 </span>
 
                 <div className="relative">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cream-50/15 backdrop-blur transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-cream-50/25">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cream-50/15 backdrop-blur transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-cream-50/25 sm:h-11 sm:w-11">
                     <m.icon className="h-5 w-5" strokeWidth={1.8} />
                   </div>
-                  <h3 className="mt-5 font-display text-2xl">{m.title}</h3>
+                  <h3 className="mt-4 font-display text-xl sm:mt-5 sm:text-2xl">
+                    {m.title}
+                  </h3>
                   <p className="mt-1 text-sm text-cream-100/80">
                     {m.subtitle}
                   </p>
                 </div>
 
-                <div className="relative mt-8 flex items-end justify-between gap-3 border-t border-cream-50/15 pt-4">
+                <div className="relative mt-6 flex items-end justify-between gap-3 border-t border-cream-50/15 pt-4 sm:mt-8">
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-100/70">
                       We suggest

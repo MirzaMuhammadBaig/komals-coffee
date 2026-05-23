@@ -120,8 +120,8 @@ export default function MenuExplorer() {
 
   return (
     <>
-      <section className="sticky top-20 z-30 border-b border-espresso-100 bg-cream-50/90 backdrop-blur">
-        <div className="container-base flex flex-col gap-3 py-4 sm:py-5">
+      <section className="sticky top-16 z-30 border-b border-espresso-100 bg-cream-50/90 backdrop-blur sm:top-20">
+        <div className="container-base flex flex-col gap-3 py-3 sm:py-5">
           {/* Search input — capped width on bigger screens so it doesn't
               dwarf the page. Full width on mobile for thumb-friendly typing. */}
           <div className="relative w-full lg:max-w-md">
@@ -166,8 +166,9 @@ export default function MenuExplorer() {
             )}
           </div>
 
-          {/* Category chips with live match counts */}
-          <div className="flex flex-wrap gap-2">
+          {/* Category chips with live match counts — horizontally
+              scrollable on mobile so the row doesn't wrap into a tower. */}
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
             {menuCategories.map((c) => {
               const count = matches.filter((m) => m.category === c.slug).length;
               const dim = q !== "" && count === 0;
@@ -177,7 +178,7 @@ export default function MenuExplorer() {
                   href={dim ? undefined : `#${c.slug}`}
                   aria-disabled={dim || undefined}
                   className={cn(
-                    "group inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-200",
+                    "group inline-flex shrink-0 items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 sm:shrink sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.2em]",
                     dim
                       ? "cursor-not-allowed border-espresso-100 text-espresso-300 opacity-50"
                       : "border-espresso-100 text-espresso-600 hover:-translate-y-0.5 hover:border-espresso-700 hover:bg-espresso-700 hover:text-cream-50 hover:shadow-md active:translate-y-0 active:scale-95",
@@ -225,9 +226,9 @@ export default function MenuExplorer() {
 
       <section
         id="menu-results"
-        className="pb-14 pt-10 sm:pb-20 sm:pt-12 lg:pb-28"
+        className="pb-12 pt-8 sm:pb-20 sm:pt-12 lg:pb-28"
       >
-        <div className="container-base space-y-24">
+        <div className="container-base space-y-14 sm:space-y-20 lg:space-y-24">
           {groups.length === 0 ? (
             <div className="mx-auto max-w-xl rounded-3xl border border-dashed border-espresso-200 bg-cream-100/40 px-6 py-16 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-cream-100 text-espresso-400">
@@ -253,11 +254,11 @@ export default function MenuExplorer() {
             </div>
           ) : (
             groups.map((cat) => (
-              <div key={cat.slug} id={cat.slug} className="scroll-mt-48">
-                <div className="flex flex-col gap-3 border-b border-espresso-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
+              <div key={cat.slug} id={cat.slug} className="scroll-mt-40 sm:scroll-mt-48">
+                <div className="flex flex-col gap-2 border-b border-espresso-100 pb-5 sm:flex-row sm:items-end sm:justify-between sm:gap-3 sm:pb-6">
                   <div>
                     <p className="eyebrow">{cat.name}</p>
-                    <h2 className="mt-3 font-display text-4xl text-espresso-800">
+                    <h2 className="mt-2 font-display text-2xl text-espresso-800 sm:mt-3 sm:text-3xl lg:text-4xl">
                       {cat.name}
                     </h2>
                   </div>
@@ -266,14 +267,14 @@ export default function MenuExplorer() {
                   </p>
                 </div>
 
-                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-8 grid gap-5 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                   {cat.items.map((item) => (
                     <Link
                       key={item.slug}
                       href={`/menu/${item.slug}`}
                       className="card-hoverable group block overflow-hidden active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-caramel-400 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50"
                     >
-                      <div className="relative h-48 w-full overflow-hidden">
+                      <div className="relative h-40 w-full overflow-hidden sm:h-48">
                         <SafeImage
                           src={item.image}
                           alt={item.name}
@@ -293,9 +294,9 @@ export default function MenuExplorer() {
                           </span>
                         )}
                       </div>
-                      <div className="p-6">
-                        <div className="flex items-baseline justify-between gap-4">
-                          <h3 className="font-display text-xl text-espresso-800 transition-colors duration-300 group-hover:text-caramel-700">
+                      <div className="p-5 sm:p-6">
+                        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                          <h3 className="font-display text-lg text-espresso-800 transition-colors duration-300 group-hover:text-caramel-700 sm:text-xl">
                             <Highlight text={item.name} query={query} />
                           </h3>
                           <span className="font-semibold text-espresso-700 transition-colors duration-300 group-hover:text-caramel-600">
@@ -303,7 +304,7 @@ export default function MenuExplorer() {
                           </span>
                         </div>
                         {item.size && (
-                          <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-espresso-400">
+                          <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-espresso-400 sm:text-[11px]">
                             {item.size}
                           </p>
                         )}

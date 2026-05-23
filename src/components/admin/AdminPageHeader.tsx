@@ -20,14 +20,14 @@ export default function AdminPageHeader({
   actions?: Action[];
 }) {
   return (
-    <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
-      <div>
+    <div className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4 sm:pb-6">
+      <div className="min-w-0">
         {eyebrow && (
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-espresso-400 sm:text-[11px] sm:tracking-[0.2em]">
             {eyebrow}
           </p>
         )}
-        <h2 className="mt-1 font-display text-2xl text-espresso-800 sm:text-3xl">
+        <h2 className="mt-1 break-words font-display text-xl text-espresso-800 sm:text-2xl lg:text-3xl">
           {title}
         </h2>
         {description && (

@@ -50,7 +50,7 @@ export default async function AdminProductsPage() {
         </div>
       ) : (
         <div className="card overflow-hidden">
-          <div className="hidden grid-cols-[80px_1.5fr_1fr_0.8fr_0.6fr_auto] gap-4 border-b border-espresso-100 bg-cream-100/50 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-espresso-500 md:grid">
+          <div className="hidden grid-cols-[80px_1.5fr_1fr_0.8fr_0.6fr_auto] gap-4 border-b border-espresso-100 bg-cream-100/50 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-espresso-500 lg:grid">
             <span></span>
             <span>Name</span>
             <span>Category</span>
@@ -62,9 +62,9 @@ export default async function AdminProductsPage() {
             {items.map((it) => (
               <li
                 key={it.id}
-                className="grid grid-cols-[64px_1fr_auto] items-center gap-4 px-5 py-3 transition-colors hover:bg-cream-100/40 md:grid-cols-[80px_1.5fr_1fr_0.8fr_0.6fr_auto]"
+                className="grid grid-cols-[56px_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-cream-100/40 sm:grid-cols-[64px_1fr_auto] sm:gap-4 sm:px-5 lg:grid-cols-[80px_1.5fr_1fr_0.8fr_0.6fr_auto]"
               >
-                <div className="relative h-12 w-12 overflow-hidden rounded-lg bg-cream-100 md:h-14 md:w-14">
+                <div className="relative h-12 w-12 overflow-hidden rounded-lg bg-cream-100 sm:h-14 sm:w-14">
                   <SafeImage
                     src={it.image_url}
                     alt={it.name}
@@ -74,29 +74,39 @@ export default async function AdminProductsPage() {
                   />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate font-display text-base text-espresso-800">
+                  <p className="truncate font-display text-sm text-espresso-800 sm:text-base">
                     {it.name}
                   </p>
-                  <p className="truncate text-xs text-espresso-400">
+                  <p className="truncate text-[11px] text-espresso-400 sm:text-xs">
                     {it.slug}
                     {it.size && ` · ${it.size}`}
                   </p>
-                  <div className="mt-1 flex flex-wrap gap-1 md:hidden">
+                  <div className="mt-1 flex flex-wrap gap-x-1 gap-y-0.5 lg:hidden">
                     <span className="text-[11px] text-espresso-500">
                       {catMap.get(it.category_id as string) ?? "—"}
                     </span>
                     <span className="text-[11px] font-semibold text-espresso-700">
                       · {formatPkr(it.price_pkr)}
                     </span>
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1 rounded-full px-1.5 py-0 text-[9px] font-semibold uppercase tracking-[0.12em]",
+                        it.is_active
+                          ? "bg-green-50 text-green-700"
+                          : "bg-cream-100 text-espresso-400",
+                      )}
+                    >
+                      {it.is_active ? "Active" : "Off"}
+                    </span>
                   </div>
                 </div>
-                <span className="hidden text-sm text-espresso-600 md:inline">
+                <span className="hidden text-sm text-espresso-600 lg:inline">
                   {catMap.get(it.category_id as string) ?? "—"}
                 </span>
-                <span className="hidden font-semibold tabular-nums text-espresso-800 md:inline">
+                <span className="hidden font-semibold tabular-nums text-espresso-800 lg:inline">
                   {formatPkr(it.price_pkr)}
                 </span>
-                <span className="hidden md:inline">
+                <span className="hidden lg:inline">
                   <span
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em]",

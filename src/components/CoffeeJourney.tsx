@@ -57,7 +57,7 @@ export default function CoffeeJourney() {
           </div>
         </Reveal>
 
-        <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <ol className="mt-10 grid gap-5 sm:mt-14 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
           {steps.map((s, i) => (
             <Reveal
               key={s.title}
@@ -69,7 +69,7 @@ export default function CoffeeJourney() {
                 {/* Step number watermark */}
                 <span
                   aria-hidden
-                  className="absolute right-3 top-2 font-display text-4xl font-bold leading-none text-espresso-100 transition-colors duration-300 group-hover:text-caramel-500/30 sm:right-4 sm:top-3 sm:text-5xl"
+                  className="absolute right-3 top-2 font-display text-3xl font-bold leading-none text-espresso-100 transition-colors duration-300 group-hover:text-caramel-500/30 sm:right-4 sm:top-3 sm:text-5xl"
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
