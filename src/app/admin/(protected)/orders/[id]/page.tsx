@@ -4,6 +4,7 @@ import { ArrowLeft, MessageCircle, Phone } from "lucide-react";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import OrderStatusControls from "@/components/admin/OrderStatusControls";
+import { tickAutoAdvance } from "@/lib/admin/orders";
 import { formatPkr } from "@/lib/utils";
 import { whatsappLink } from "@/lib/utils";
 
@@ -14,6 +15,10 @@ export default async function AdminOrderDetailPage({
 }: {
   params: { id: string };
 }) {
+  // Lazy-on-read auto-advance before we load this order, so the detail
+  // page reflects the same state the list does.
+  await tickAutoAdvance();
+
   const supabase = createSupabaseServiceClient();
   const { data: order } = await supabase
     .from("orders")
@@ -24,6 +29,11 @@ export default async function AdminOrderDetailPage({
   if (!order) notFound();
 
   const items = (order.items as Item[]) ?? [];
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const firstName =
+    typeof order.name === "string" && order.name.trim()
+      ? order.name.trim().split(/\s+/)[0]
+      : "there";
 
   return (
     <div className="space-y-6">
@@ -37,7 +47,7 @@ export default async function AdminOrderDetailPage({
       </div>
 
       <AdminPageHeader
-        eyebrow={`Order #${order.id.slice(0, 8)}`}
+        eyebrow={`Order ${orderNumber}`}
         title={order.name}
         description={`Placed ${new Date(order.created_at).toLocaleString("en-PK")}`}
       />
@@ -129,11 +139,11 @@ export default async function AdminOrderDetailPage({
               <Row label="Phone (WhatsApp)" value={order.phone} />
               <Row label="Phone 2" value={order.secondary_phone} />
             </dl>
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <a
                 href={whatsappLink(
                   order.phone,
-                  `Hi ${order.name}, this is Komal about your order…`,
+                  `Hi ${firstName}! Following up on your order ${orderNumber}.`,
                 )}
                 target="_blank"
                 rel="noreferrer noopener"
@@ -161,7 +171,7 @@ export default async function AdminOrderDetailPage({
               />
               <Row
                 label="Provider"
-                value={order.payment_provider ?? "—"}
+                value={order.payment_provider ?? "Not set"}
               />
               <Row label="Status" value={order.payment_status} />
               {order.payment_tracker && (
@@ -195,7 +205,7 @@ function Row({
             : "max-w-[60%] truncate text-right text-espresso-700"
         }
       >
-        {value || "—"}
+        {value || "Not set"}
       </dd>
     </div>
   );

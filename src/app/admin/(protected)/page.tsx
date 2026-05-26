@@ -8,9 +8,15 @@ import {
   Coffee,
   Star,
   Mail,
+  Gauge,
 } from "lucide-react";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { formatPkr, cn } from "@/lib/utils";
+import { getStoreSettings } from "@/lib/admin/store";
+import {
+  BUSYNESS_LABELS,
+  BUSYNESS_MULTIPLIERS,
+} from "@/lib/admin/busyness-types";
 
 type OrderRow = {
   id: string;
@@ -99,7 +105,7 @@ async function loadStats() {
 }
 
 export default async function AdminDashboardPage() {
-  const data = await loadStats();
+  const [data, store] = await Promise.all([loadStats(), getStoreSettings()]);
 
   if (!data) {
     return (
@@ -195,6 +201,47 @@ export default async function AdminDashboardPage() {
           );
         })}
       </div>
+
+      {/* Busyness pill */}
+      {store && (
+        <Link
+          href="/admin/busyness"
+          className="card-hoverable group flex flex-col items-start gap-3 p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-caramel-500/15 text-caramel-700 transition-transform duration-200 group-hover:scale-110">
+            <Gauge className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
+              Busyness
+            </p>
+            <p className="mt-0.5 font-display text-base text-espresso-800 sm:text-lg">
+              {BUSYNESS_LABELS[store.busyness_level]}{" "}
+              <span className="text-sm text-espresso-500">
+                · ×{BUSYNESS_MULTIPLIERS[store.busyness_level]} multiplier
+              </span>
+            </p>
+            <p className="mt-1 text-xs text-espresso-500">
+              Auto-advance: new → confirmed {" "}
+              <span className="font-semibold text-espresso-700 tabular-nums">
+                ~
+                {store.auto_progress_minutes.new_to_confirmed *
+                  BUSYNESS_MULTIPLIERS[store.busyness_level]}{" "}
+                min
+              </span>
+              , confirmed → out for delivery{" "}
+              <span className="font-semibold text-espresso-700 tabular-nums">
+                ~
+                {store.auto_progress_minutes.confirmed_to_out_for_delivery *
+                  BUSYNESS_MULTIPLIERS[store.busyness_level]}{" "}
+                min
+              </span>
+              .
+            </p>
+          </div>
+          <ArrowUpRight className="h-4 w-4 shrink-0 text-espresso-300 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </Link>
+      )}
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Recent orders */}

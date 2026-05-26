@@ -9,6 +9,7 @@ import {
   Star,
   Mail,
   Megaphone,
+  Gauge,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
@@ -58,6 +59,7 @@ export const adminNavSections: AdminNavSection[] = [
         label: "Announcement",
         icon: Megaphone,
       },
+      { href: "/admin/busyness", label: "Busyness", icon: Gauge },
     ],
   },
 ];

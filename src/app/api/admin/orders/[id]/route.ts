@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/admin/guard";
+import { getStoreSettings } from "@/lib/admin/store";
+import { nextAutoAdvanceAt } from "@/lib/admin/busyness-types";
 
 export const runtime = "nodejs";
 
@@ -60,11 +62,41 @@ export async function PATCH(
     );
   }
 
+  // If the admin is manually advancing the status, reschedule the
+  // auto-advance timer for the new status (or clear it for terminal
+  // statuses). This keeps the busyness pipeline accurate.
+  if (typeof patch.status === "string") {
+    const settings = await getStoreSettings();
+    if (settings) {
+      const future = nextAutoAdvanceAt(
+        patch.status as string,
+        settings.busyness_level,
+        settings.auto_progress_minutes,
+      );
+      patch.auto_advance_at = future ? future.toISOString() : null;
+    }
+  }
+
   const supabase = createSupabaseServiceClient();
-  const { error } = await supabase
+  let { error } = await supabase
     .from("orders")
     .update(patch)
     .eq("id", params.id);
+
+  // Defensive — if 002_busyness has not been applied yet, retry without
+  // the auto_advance_at field so legacy installs keep working.
+  if (error && /auto_advance_at/i.test(error.message)) {
+    const { auto_advance_at: _omit, ...rest } = patch as {
+      auto_advance_at?: unknown;
+    } & Record<string, unknown>;
+    void _omit;
+    const retry = await supabase
+      .from("orders")
+      .update(rest)
+      .eq("id", params.id);
+    error = retry.error;
+  }
+
   if (error) {
     console.error("admin order update", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

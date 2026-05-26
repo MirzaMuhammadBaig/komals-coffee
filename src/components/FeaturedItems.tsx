@@ -31,9 +31,11 @@ export default function FeaturedItems() {
 
         <div className="mt-10 grid gap-5 sm:mt-14 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {bestsellers.slice(0, 6).map((item) => (
-            <article
+            <Link
               key={item.slug}
-              className="card-hoverable group overflow-hidden active:scale-[0.99]"
+              href={`/menu/${item.slug}`}
+              aria-label={`View ${item.name} details`}
+              className="card-hoverable group block overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-caramel-400 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-100 active:scale-[0.99]"
             >
               <div className="relative h-44 w-full overflow-hidden bg-espresso-100 sm:h-52 lg:h-56">
                 <SafeImage
@@ -73,7 +75,7 @@ export default function FeaturedItems() {
                   {item.description}
                 </p>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

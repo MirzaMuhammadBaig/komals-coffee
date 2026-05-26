@@ -5,6 +5,7 @@ import {
   isSafepayConfigured,
 } from "@/lib/safepay/client";
 import { getStoreSettings } from "@/lib/admin/store";
+import { nextAutoAdvanceAt } from "@/lib/admin/busyness-types";
 
 export const runtime = "nodejs";
 
@@ -90,28 +91,64 @@ export async function POST(req: Request) {
     );
   }
 
-  const supabase = createSupabaseServiceClient();
-  const { data: inserted, error } = await supabase
-    .from("orders")
-    .insert({
-      name,
-      phone,
-      secondary_phone: secondaryPhone,
-      email,
-      delivery_address: deliveryAddress,
-      notes,
-      items,
-      total_pkr: totalPkr,
-      channel: "website",
-      payment_method: paymentMethod,
-      payment_status: "pending",
-      payment_provider: paymentMethod === "card" ? "safepay" : null,
-    })
-    .select("id")
-    .single();
+  // Start the auto-advance clock the moment the order lands. COD starts
+  // immediately ("new" already counts); card orders need to be paid first,
+  // so we leave auto_advance_at null and let the webhook set it on capture.
+  let initialAutoAdvanceAt: string | null = null;
+  if (paymentMethod === "cod" && store) {
+    const future = nextAutoAdvanceAt(
+      "new",
+      store.busyness_level,
+      store.auto_progress_minutes,
+    );
+    if (future) initialAutoAdvanceAt = future.toISOString();
+  }
 
-  if (error || !inserted) {
-    console.error("order insert failed", error);
+  const supabase = createSupabaseServiceClient();
+  const baseInsert = {
+    name,
+    phone,
+    secondary_phone: secondaryPhone,
+    email,
+    delivery_address: deliveryAddress,
+    notes,
+    items,
+    total_pkr: totalPkr,
+    channel: "website",
+    payment_method: paymentMethod,
+    payment_status: "pending",
+    payment_provider: paymentMethod === "card" ? "safepay" : null,
+  } as Record<string, unknown>;
+
+  // Defensive: try with the new auto_advance_at column. If the busyness
+  // migration has not been applied yet, retry without it so ordering
+  // keeps working in older deployments.
+  let inserted: { id: string } | null = null;
+  let insertError: { message: string; code?: string } | null = null;
+  {
+    const payload = initialAutoAdvanceAt
+      ? { ...baseInsert, auto_advance_at: initialAutoAdvanceAt }
+      : baseInsert;
+    const res = await supabase
+      .from("orders")
+      .insert(payload)
+      .select("id")
+      .single();
+    inserted = res.data;
+    insertError = res.error;
+  }
+  if (insertError && /auto_advance_at/i.test(insertError.message)) {
+    const res = await supabase
+      .from("orders")
+      .insert(baseInsert)
+      .select("id")
+      .single();
+    inserted = res.data;
+    insertError = res.error;
+  }
+
+  if (insertError || !inserted) {
+    console.error("order insert failed", insertError);
     return NextResponse.json(
       { error: "Could not save your order. Please try again in a moment." },
       { status: 500 },

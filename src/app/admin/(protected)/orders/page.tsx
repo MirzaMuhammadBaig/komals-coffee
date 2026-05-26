@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import { tickAutoAdvance } from "@/lib/admin/orders";
 import { formatPkr, cn } from "@/lib/utils";
 
 const STATUS_FILTERS = [
@@ -19,6 +20,10 @@ export default async function AdminOrdersPage({
 }) {
   const status = searchParams.status ?? "all";
   const q = (searchParams.q ?? "").trim();
+
+  // Lazy-on-read: sweep any orders whose auto_advance_at is in the past
+  // before we render the list, so the page reflects current state.
+  await tickAutoAdvance();
 
   const supabase = createSupabaseServiceClient();
   let query = supabase
