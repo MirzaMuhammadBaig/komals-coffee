@@ -18,6 +18,9 @@ import { cn, formatPkr } from "@/lib/utils";
 import { site } from "@/lib/data/site";
 import { useCart } from "@/lib/cart/CartContext";
 import ProductDetailModal from "@/components/ProductDetailModal";
+import CouponInput, {
+  type AppliedCoupon,
+} from "@/components/CouponInput";
 
 type PaymentMethod = "cod" | "card";
 
@@ -32,6 +35,14 @@ export default function OrderForm() {
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
+
+  // Subtotal is the raw items total; payable is the post-discount number
+  // we send to /api/orders. The server re-validates the coupon and
+  // recomputes the discount — never trust this client-side figure.
+  const subtotal = total;
+  const discount = coupon ? Math.min(coupon.discount_pkr, subtotal) : 0;
+  const payable = Math.max(0, subtotal - discount);
 
   const TOP_LIMIT = 10;
   const isSearching = query.trim().length > 0;
@@ -104,8 +115,10 @@ export default function OrderForm() {
         qty: l.qty,
         unit_price_pkr: l.item.price,
       })),
-      total_pkr: total,
+      subtotal_pkr: subtotal,
+      total_pkr: payable,
       payment_method: paymentMethod,
+      coupon_code: coupon?.code ?? null,
     };
 
     try {
@@ -326,7 +339,7 @@ export default function OrderForm() {
                 className="btn-primary w-full justify-center"
               >
                 Continue with {itemCount} item{itemCount > 1 ? "s" : ""} ·{" "}
-                {formatPkr(total)}
+                {formatPkr(payable)}
               </a>
             </div>
           )}
@@ -481,12 +494,37 @@ export default function OrderForm() {
                   </span>
                 </li>
               ))}
+              <li className="flex items-center justify-between border-t border-espresso-100 pt-2 text-espresso-700">
+                <span>Subtotal</span>
+                <span className="tabular-nums">{formatPkr(subtotal)}</span>
+              </li>
+              {coupon && discount > 0 && (
+                <li className="flex items-center justify-between text-green-700">
+                  <span className="font-mono tracking-wider">
+                    {coupon.code}
+                  </span>
+                  <span className="tabular-nums">
+                    − {formatPkr(discount)}
+                  </span>
+                </li>
+              )}
               <li className="flex items-center justify-between border-t border-espresso-100 pt-2 font-semibold text-espresso-800">
                 <span>Total</span>
-                <span className="tabular-nums">{formatPkr(total)}</span>
+                <span className="tabular-nums">{formatPkr(payable)}</span>
               </li>
             </ul>
           )}
+
+          {items.length > 0 && (
+            <div className="mt-4">
+              <CouponInput
+                subtotal_pkr={subtotal}
+                applied={coupon}
+                onChange={setCoupon}
+              />
+            </div>
+          )}
+
           <p className="mt-3 text-xs text-espresso-400">
             Minimum order {formatPkr(site.service.minOrder)} · Delivery fee
             calculated after confirmation.
@@ -611,10 +649,10 @@ export default function OrderForm() {
           ) : paymentMethod === "card" ? (
             <>
               <CreditCard className="h-4 w-4" />
-              Pay {formatPkr(total)} with card
+              Pay {formatPkr(payable)} with card
             </>
           ) : (
-            <>Place order · {formatPkr(total)}</>
+            <>Place order · {formatPkr(payable)}</>
           )}
         </button>
 

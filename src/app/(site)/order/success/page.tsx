@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -10,12 +10,20 @@ import {
   MessageCircle,
   Printer,
   ShoppingBag,
+  Tag,
   Truck,
   Store as PickupIcon,
 } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { site } from "@/lib/data/site";
-import { whatsappLink } from "@/lib/utils";
+import { formatPkr, whatsappLink } from "@/lib/utils";
+
+type ReceiptSummary = {
+  subtotal_pkr: number | null;
+  discount_pkr: number | null;
+  coupon_code: string | null;
+  total_pkr: number | null;
+};
 
 /**
  * Order success — shown after a Safepay redirect (card payments). Reads
@@ -48,10 +56,40 @@ function OrderSuccessInner() {
       ? "pickup"
       : ("delivery" as const);
 
+  const [receipt, setReceipt] = useState<ReceiptSummary | null>(null);
+
   // Clear the cart once the user has returned from Safepay successfully.
   useEffect(() => {
     clear();
   }, [clear]);
+
+  // Fetch the receipt summary (subtotal/discount/coupon/total). Order id
+  // is the only thing in the URL — we never leak the customer's promo
+  // or pricing into the address bar. A 404 just hides the block.
+  useEffect(() => {
+    if (!orderId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`/api/orders/${orderId}/summary`, {
+          cache: "no-store",
+        });
+        if (!r.ok) return;
+        const json = (await r.json()) as ReceiptSummary;
+        if (!cancelled) setReceipt(json);
+      } catch {
+        // Silent — we already display the order number + chips from the URL.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId]);
+
+  const showPricing =
+    receipt &&
+    typeof receipt.total_pkr === "number" &&
+    receipt.total_pkr >= 0;
 
   function onPrint() {
     if (typeof window !== "undefined") window.print();
@@ -92,6 +130,52 @@ function OrderSuccessInner() {
                 <p className="mt-2 text-xs text-espresso-500">
                   Quote this if you message Komal about your order.
                 </p>
+              </div>
+            )}
+
+            {/* Pricing breakdown — fetched from the order summary endpoint. */}
+            {showPricing && (
+              <div className="rounded-2xl border border-espresso-100 bg-white p-4 sm:p-5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-espresso-400 sm:text-[11px]">
+                  Receipt
+                </p>
+                <dl className="mt-3 space-y-2 text-sm">
+                  {typeof receipt.subtotal_pkr === "number" && (
+                    <Row
+                      label="Subtotal"
+                      value={formatPkr(receipt.subtotal_pkr)}
+                    />
+                  )}
+                  {receipt.coupon_code &&
+                    typeof receipt.discount_pkr === "number" &&
+                    receipt.discount_pkr > 0 && (
+                      <Row
+                        label={
+                          <span className="inline-flex items-center gap-1.5 font-mono tracking-wider text-green-700">
+                            <Tag className="h-3.5 w-3.5" />
+                            {receipt.coupon_code}
+                          </span>
+                        }
+                        value={
+                          <span className="text-green-700">
+                            − {formatPkr(receipt.discount_pkr)}
+                          </span>
+                        }
+                      />
+                    )}
+                  <Row
+                    label={
+                      <span className="font-semibold text-espresso-800">
+                        Total paid
+                      </span>
+                    }
+                    value={
+                      <span className="font-display text-lg text-espresso-800">
+                        {formatPkr(receipt.total_pkr ?? 0)}
+                      </span>
+                    }
+                  />
+                </dl>
               </div>
             )}
 
@@ -209,5 +293,20 @@ function OrderSuccessInner() {
         </p>
       </div>
     </section>
+  );
+}
+
+function Row({
+  label,
+  value,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 text-sm text-espresso-700">
+      <dt>{label}</dt>
+      <dd className="tabular-nums">{value}</dd>
+    </div>
   );
 }

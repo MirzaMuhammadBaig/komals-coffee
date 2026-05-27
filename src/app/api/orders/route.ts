@@ -6,6 +6,11 @@ import {
 } from "@/lib/safepay/client";
 import { getStoreSettings } from "@/lib/admin/store";
 import { nextAutoAdvanceAt } from "@/lib/admin/busyness-types";
+import {
+  computeDiscount,
+  redeemCoupon,
+  validateCoupon,
+} from "@/lib/coupons";
 
 export const runtime = "nodejs";
 
@@ -48,10 +53,10 @@ export async function POST(req: Request) {
       ? body.delivery_address.trim()
       : "";
   const notes = typeof body.notes === "string" ? body.notes.trim() : null;
-  const totalPkr =
-    typeof body.total_pkr === "number" ? Math.round(body.total_pkr) : null;
   const items = Array.isArray(body.items) ? (body.items as OrderItem[]) : [];
   const paymentMethod = body.payment_method === "card" ? "card" : "cod";
+  const rawCouponCode =
+    typeof body.coupon_code === "string" ? body.coupon_code.trim() : "";
 
   if (!name || !phone || !secondaryPhone || !deliveryAddress) {
     return NextResponse.json(
@@ -83,6 +88,44 @@ export async function POST(req: Request) {
     }
   }
 
+  // ── Server-authoritative pricing.
+  //
+  // Recompute the subtotal from the items the customer sent. We never
+  // trust a client-supplied total: a malicious client could otherwise
+  // claim a 10,000 PKR order is 1 PKR. The coupon is then re-validated
+  // against this trusted subtotal before any charge.
+  const supabase = createSupabaseServiceClient();
+  const subtotalPkr = items.reduce(
+    (s, it) => s + Math.max(0, Math.round(it.qty * it.unit_price_pkr)),
+    0,
+  );
+
+  let discountPkr = 0;
+  let couponCodeStored: string | null = null;
+
+  if (rawCouponCode) {
+    const preview = await validateCoupon(supabase, rawCouponCode, subtotalPkr);
+    if (!preview.ok) {
+      return NextResponse.json(
+        { error: preview.message, reason: preview.reason },
+        { status: 400 },
+      );
+    }
+    // Atomic redeem. If the row got used up in another order between
+    // the preview and this insert, redeemCoupon returns null and we
+    // proceed without the discount rather than over-redeem.
+    const redeemed = await redeemCoupon(supabase, preview.coupon.code);
+    if (redeemed) {
+      discountPkr = computeDiscount(
+        { kind: redeemed.kind, value: redeemed.value },
+        subtotalPkr,
+      );
+      couponCodeStored = redeemed.code.toUpperCase();
+    }
+  }
+
+  const totalPkr = Math.max(0, subtotalPkr - discountPkr);
+
   // Card payments must have a valid total to charge.
   if (paymentMethod === "card" && (!totalPkr || totalPkr <= 0)) {
     return NextResponse.json(
@@ -104,7 +147,6 @@ export async function POST(req: Request) {
     if (future) initialAutoAdvanceAt = future.toISOString();
   }
 
-  const supabase = createSupabaseServiceClient();
   const baseInsert = {
     name,
     phone,
@@ -113,6 +155,9 @@ export async function POST(req: Request) {
     delivery_address: deliveryAddress,
     notes,
     items,
+    subtotal_pkr: subtotalPkr,
+    discount_pkr: discountPkr,
+    coupon_code: couponCodeStored,
     total_pkr: totalPkr,
     channel: "website",
     payment_method: paymentMethod,
@@ -120,29 +165,41 @@ export async function POST(req: Request) {
     payment_provider: paymentMethod === "card" ? "safepay" : null,
   } as Record<string, unknown>;
 
-  // Defensive: try with the new auto_advance_at column. If the busyness
-  // migration has not been applied yet, retry without it so ordering
-  // keeps working in older deployments.
+  // Defensive: try the insert with every newer column we know about. If
+  // a migration has not been applied yet, peel off the unrecognised
+  // column from the payload and retry, so legacy deployments keep
+  // accepting orders.
+  const tryInsert = async (payload: Record<string, unknown>) =>
+    supabase.from("orders").insert(payload).select("id").single();
+
   let inserted: { id: string } | null = null;
   let insertError: { message: string; code?: string } | null = null;
   {
     const payload = initialAutoAdvanceAt
       ? { ...baseInsert, auto_advance_at: initialAutoAdvanceAt }
       : baseInsert;
-    const res = await supabase
-      .from("orders")
-      .insert(payload)
-      .select("id")
-      .single();
+    const res = await tryInsert(payload);
     inserted = res.data;
     insertError = res.error;
   }
-  if (insertError && /auto_advance_at/i.test(insertError.message)) {
-    const res = await supabase
-      .from("orders")
-      .insert(baseInsert)
-      .select("id")
-      .single();
+  // Peel off any column the DB does not yet know about. Up to 4 retries
+  // covers auto_advance_at, subtotal_pkr, discount_pkr, coupon_code.
+  for (let i = 0; i < 4 && insertError && !inserted; i++) {
+    const missing = insertError.message.match(
+      /column "?(auto_advance_at|subtotal_pkr|discount_pkr|coupon_code)"?/i,
+    );
+    if (!missing) break;
+    const col = missing[1];
+    const trimmed = { ...baseInsert } as Record<string, unknown>;
+    delete trimmed[col];
+    // Also re-add auto_advance_at if we're not peeling that one off.
+    const payload =
+      col === "auto_advance_at"
+        ? trimmed
+        : initialAutoAdvanceAt
+        ? { ...trimmed, auto_advance_at: initialAutoAdvanceAt }
+        : trimmed;
+    const res = await tryInsert(payload);
     inserted = res.data;
     insertError = res.error;
   }

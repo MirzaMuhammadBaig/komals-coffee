@@ -17,6 +17,15 @@ import {
   BUSYNESS_LABELS,
   BUSYNESS_MULTIPLIERS,
 } from "@/lib/admin/busyness-types";
+import {
+  buildRangeQuery,
+  DATE_RANGES,
+  DEFAULT_RANGE,
+  resolveDateRange,
+  type DateRange,
+} from "@/lib/admin/date-ranges";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import DateRangeFilter from "@/components/admin/DateRangeFilter";
 
 type OrderRow = {
   id: string;
@@ -29,35 +38,51 @@ type OrderRow = {
   items: { name: string; qty: number }[];
 };
 
-async function loadStats() {
+async function loadStats(since: Date | null, until: Date | null) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return null;
   }
   try {
     const supabase = createSupabaseServiceClient();
 
-    const since = new Date();
-    since.setDate(since.getDate() - 30);
+    // Builders that apply the optional time window to a query.
+    const inWindow = <T,>(
+      q: T extends { gte: (col: string, v: string) => T }
+        ? T
+        : never,
+    ): T => {
+      let out = q as unknown as {
+        gte: (col: string, v: string) => unknown;
+        lte: (col: string, v: string) => unknown;
+      };
+      if (since) out = out.gte("created_at", since.toISOString()) as typeof out;
+      if (until) out = out.lte("created_at", until.toISOString()) as typeof out;
+      return out as unknown as T;
+    };
 
     const [
-      { count: totalOrders30d },
+      { count: totalOrdersInRange },
       { count: pendingCount },
       { data: revenueRows },
       { data: recentOrders },
     ] = await Promise.all([
+      inWindow(
+        supabase.from("orders").select("*", { count: "exact", head: true }),
+      ),
+      // Pending is always "right now" — not bounded by the dashboard window,
+      // so the admin can still see un-acknowledged orders from earlier days.
       supabase
         .from("orders")
         .select("*", { count: "exact", head: true })
-        .gte("created_at", since.toISOString()),
-      supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "new"),
-      supabase
-        .from("orders")
-        .select("total_pkr, payment_status, created_at")
-        .gte("created_at", since.toISOString())
-        .eq("payment_status", "paid"),
+        .in("status", ["new", "confirmed"]),
+      inWindow(
+        supabase
+          .from("orders")
+          .select("total_pkr, payment_status, created_at")
+          .eq("payment_status", "paid"),
+      ),
+      // Recent orders list is always the latest 8 regardless of range, so the
+      // admin can act on anything fresh without changing filters.
       supabase
         .from("orders")
         .select(
@@ -67,17 +92,21 @@ async function loadStats() {
         .limit(8),
     ]);
 
-    const revenue30d = (revenueRows ?? []).reduce(
+    const revenueInRange = (revenueRows ?? []).reduce(
       (s, r) => s + (r.total_pkr ?? 0),
       0,
     );
 
-    // Top items across recent orders (last 50).
-    const { data: itemSample } = await supabase
+    // Top items across the same window — falls back to "recent 50" if the
+    // range is "all time" so the table is not empty on a fresh project.
+    let topItemsQuery = supabase
       .from("orders")
-      .select("items")
+      .select("items, created_at")
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(200);
+    if (since) topItemsQuery = topItemsQuery.gte("created_at", since.toISOString());
+    if (until) topItemsQuery = topItemsQuery.lte("created_at", until.toISOString());
+    const { data: itemSample } = await topItemsQuery;
 
     const tally = new Map<string, number>();
     for (const row of itemSample ?? []) {
@@ -92,9 +121,9 @@ async function loadStats() {
       .slice(0, 5);
 
     return {
-      totalOrders30d: totalOrders30d ?? 0,
+      totalOrdersInRange: totalOrdersInRange ?? 0,
       pendingCount: pendingCount ?? 0,
-      revenue30d,
+      revenueInRange,
       recentOrders: (recentOrders as OrderRow[]) ?? [],
       topItems,
     };
@@ -104,8 +133,26 @@ async function loadStats() {
   }
 }
 
-export default async function AdminDashboardPage() {
-  const [data, store] = await Promise.all([loadStats(), getStoreSettings()]);
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: { range?: string; from?: string; to?: string };
+}) {
+  const current: DateRange = (DATE_RANGES as readonly string[]).includes(
+    searchParams.range ?? "",
+  )
+    ? (searchParams.range as DateRange)
+    : DEFAULT_RANGE;
+  const resolved = resolveDateRange(
+    searchParams.range,
+    searchParams.from,
+    searchParams.to,
+  );
+
+  const [data, store] = await Promise.all([
+    loadStats(resolved.since, resolved.until),
+    getStoreSettings(),
+  ]);
 
   if (!data) {
     return (
@@ -123,12 +170,20 @@ export default async function AdminDashboardPage() {
     );
   }
 
+  // Carry the current range through to the linked pages so clicking a stat
+  // card preserves context.
+  const rangeQuery = buildRangeQuery(current, {}, {
+    from: searchParams.from,
+    to: searchParams.to,
+  });
+
   const stats = [
     {
-      label: "Orders (30 days)",
-      value: data.totalOrders30d.toLocaleString(),
+      label: `Orders (${resolved.label.toLowerCase()})`,
+      value: data.totalOrdersInRange.toLocaleString(),
       icon: ShoppingBag,
       tone: "espresso",
+      href: `/admin/orders${rangeQuery}`,
     },
     {
       label: "Pending orders",
@@ -138,26 +193,39 @@ export default async function AdminDashboardPage() {
       href: "/admin/orders?status=new",
     },
     {
-      label: "Revenue paid (30d)",
-      value: formatPkr(data.revenue30d),
+      label: `Revenue paid (${resolved.label.toLowerCase()})`,
+      value: formatPkr(data.revenueInRange),
       icon: Banknote,
       tone: "matcha",
-      href: "/admin/revenue",
+      href: `/admin/revenue${rangeQuery}`,
     },
     {
-      label: "Average order (30d)",
+      label: `Average order (${resolved.label.toLowerCase()})`,
       value:
-        data.totalOrders30d > 0
-          ? formatPkr(Math.round(data.revenue30d / data.totalOrders30d))
+        data.totalOrdersInRange > 0
+          ? formatPkr(Math.round(data.revenueInRange / data.totalOrdersInRange))
           : formatPkr(0),
       icon: TrendingUp,
       tone: "blush",
-      href: "/admin/revenue",
+      href: `/admin/revenue${rangeQuery}`,
     },
   ];
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      <AdminPageHeader
+        eyebrow="Overview"
+        title="Dashboard"
+        description="High-level pulse of the business. Switch the date range to slice everything below — only Pending orders and Latest orders stay live."
+      />
+
+      <DateRangeFilter
+        basePath="/admin"
+        current={current}
+        resolved={resolved}
+        searchParams={searchParams}
+      />
+
       {/* Stat cards */}
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => {
@@ -254,7 +322,7 @@ export default async function AdminDashboardPage() {
               </h2>
             </div>
             <Link
-              href="/admin/orders"
+              href={`/admin/orders${rangeQuery}`}
               className="link-underline text-[11px] font-semibold uppercase tracking-[0.18em] text-espresso-600 hover:text-caramel-700 sm:text-xs sm:tracking-[0.2em]"
             >
               View all →
@@ -309,7 +377,7 @@ export default async function AdminDashboardPage() {
         {/* Top items + quick links */}
         <section className="card flex flex-col">
           <header className="border-b border-espresso-100 px-5 py-4">
-            <p className="eyebrow">This week</p>
+            <p className="eyebrow">{resolved.label}</p>
             <h2 className="mt-1 font-display text-lg text-espresso-800">
               Top drinks
             </h2>

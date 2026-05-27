@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AlertCircle, MessageCircle } from "lucide-react";
 import OrderForm from "@/components/OrderForm";
 import LocationHours from "@/components/LocationHours";
+import DealsStrip from "@/components/DealsStrip";
 import { getStoreSettings } from "@/lib/admin/store";
 import { site } from "@/lib/data/site";
 import { whatsappLink } from "@/lib/utils";
@@ -35,6 +36,12 @@ export default async function OrderPage() {
           </div>
 
           <div className="mt-10 sm:mt-12">
+            {/* Live deals strip — server component, renders nothing when
+                there are no active in-window deals. */}
+            <div className="mb-8 sm:mb-10">
+              <DealsStrip />
+            </div>
+
             {isClosed ? (
               <div className="card mx-auto max-w-2xl overflow-hidden">
                 <div className="bg-espresso-800 px-6 py-8 text-center text-cream-50 sm:px-10 sm:py-10">

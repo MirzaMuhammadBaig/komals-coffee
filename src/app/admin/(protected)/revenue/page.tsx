@@ -7,80 +7,15 @@ import {
 } from "lucide-react";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import DateRangeFilter from "@/components/admin/DateRangeFilter";
+import {
+  DATE_RANGES,
+  DEFAULT_RANGE,
+  isoDate,
+  resolveDateRange,
+  type DateRange,
+} from "@/lib/admin/date-ranges";
 import { cn, formatPkr } from "@/lib/utils";
-
-type Range = "today" | "yesterday" | "last_7d" | "last_30d" | "month" | "all" | "custom";
-
-const RANGES: { value: Range; label: string }[] = [
-  { value: "today", label: "Today" },
-  { value: "yesterday", label: "Yesterday" },
-  { value: "last_7d", label: "Last 7 days" },
-  { value: "last_30d", label: "Last 30 days" },
-  { value: "month", label: "This month" },
-  { value: "all", label: "All time" },
-  { value: "custom", label: "Custom" },
-];
-
-function startOf(d: Date) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-function endOf(d: Date) {
-  const x = new Date(d);
-  x.setHours(23, 59, 59, 999);
-  return x;
-}
-
-function resolveRange(
-  range: Range,
-  from?: string,
-  to?: string,
-): { since: Date | null; until: Date | null; label: string } {
-  const now = new Date();
-  switch (range) {
-    case "today":
-      return { since: startOf(now), until: endOf(now), label: "Today" };
-    case "yesterday": {
-      const y = new Date(now);
-      y.setDate(y.getDate() - 1);
-      return { since: startOf(y), until: endOf(y), label: "Yesterday" };
-    }
-    case "last_7d": {
-      const s = new Date(now);
-      s.setDate(s.getDate() - 6);
-      return { since: startOf(s), until: endOf(now), label: "Last 7 days" };
-    }
-    case "month": {
-      const s = new Date(now.getFullYear(), now.getMonth(), 1);
-      return { since: startOf(s), until: endOf(now), label: "This month" };
-    }
-    case "all":
-      return { since: null, until: null, label: "All time" };
-    case "custom": {
-      const f = from ? new Date(from) : null;
-      const t = to ? new Date(to) : null;
-      return {
-        since: f && !Number.isNaN(f.getTime()) ? startOf(f) : null,
-        until: t && !Number.isNaN(t.getTime()) ? endOf(t) : endOf(now),
-        label:
-          f && t
-            ? `${from} → ${to}`
-            : "Custom range",
-      };
-    }
-    case "last_30d":
-    default: {
-      const s = new Date(now);
-      s.setDate(s.getDate() - 29);
-      return { since: startOf(s), until: endOf(now), label: "Last 30 days" };
-    }
-  }
-}
-
-function fmtDate(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
 
 type OrderRow = {
   total_pkr: number | null;
@@ -102,9 +37,13 @@ export default async function AdminRevenuePage({
 }: {
   searchParams: { range?: string; from?: string; to?: string };
 }) {
-  const range = (searchParams.range as Range) ?? "last_30d";
-  const { since, until, label } = resolveRange(
-    range,
+  const current: DateRange = (DATE_RANGES as readonly string[]).includes(
+    searchParams.range ?? "",
+  )
+    ? (searchParams.range as DateRange)
+    : DEFAULT_RANGE;
+  const resolved = resolveDateRange(
+    searchParams.range,
     searchParams.from,
     searchParams.to,
   );
@@ -115,8 +54,8 @@ export default async function AdminRevenuePage({
     .select("total_pkr, payment_method, payment_status, status, created_at")
     .order("created_at", { ascending: true })
     .limit(5000);
-  if (since) q = q.gte("created_at", since.toISOString());
-  if (until) q = q.lte("created_at", until.toISOString());
+  if (resolved.since) q = q.gte("created_at", resolved.since.toISOString());
+  if (resolved.until) q = q.lte("created_at", resolved.until.toISOString());
   const { data: rows, error } = await q;
 
   const all = (rows as OrderRow[] | null) ?? [];
@@ -128,7 +67,7 @@ export default async function AdminRevenuePage({
   // Group by day for the by-day list.
   const byDay = new Map<string, { revenue: number; orders: number }>();
   for (const r of earned) {
-    const key = fmtDate(new Date(r.created_at));
+    const key = isoDate(new Date(r.created_at));
     const cur = byDay.get(key) ?? { revenue: 0, orders: 0 };
     cur.revenue += r.total_pkr ?? 0;
     cur.orders += 1;
@@ -137,7 +76,10 @@ export default async function AdminRevenuePage({
   const byDayList = [...byDay.entries()]
     .sort((a, b) => (a[0] < b[0] ? 1 : -1))
     .slice(0, 60);
-  const maxDayRevenue = byDayList.reduce((m, [, v]) => Math.max(m, v.revenue), 0);
+  const maxDayRevenue = byDayList.reduce(
+    (m, [, v]) => Math.max(m, v.revenue),
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -154,82 +96,12 @@ export default async function AdminRevenuePage({
         description="Pick a quick range or set a custom window. Counts paid card orders + delivered cash orders."
       />
 
-      {/* Range filter pills */}
-      <div className="flex flex-wrap items-center gap-2">
-        {RANGES.map((r) => {
-          const active = (searchParams.range ?? "last_30d") === r.value;
-          const params = new URLSearchParams();
-          if (r.value !== "last_30d") params.set("range", r.value);
-          if (r.value === "custom") {
-            if (searchParams.from) params.set("from", searchParams.from);
-            if (searchParams.to) params.set("to", searchParams.to);
-          }
-          const href = `/admin/revenue${params.toString() ? `?${params}` : ""}`;
-          return (
-            <Link
-              key={r.value}
-              href={href}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] transition-all duration-150 active:scale-95",
-                active
-                  ? "bg-espresso-700 text-cream-50 shadow-sm"
-                  : "border border-espresso-200 bg-white text-espresso-700 hover:-translate-y-0.5 hover:border-espresso-700 hover:bg-espresso-700 hover:text-cream-50",
-              )}
-            >
-              {r.label}
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Custom date inputs */}
-      {range === "custom" && (
-        <form
-          method="GET"
-          className="card flex flex-wrap items-end gap-4 p-4 sm:p-5"
-        >
-          <input type="hidden" name="range" value="custom" />
-          <label className="block">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-espresso-500">
-              From
-            </span>
-            <input
-              type="date"
-              name="from"
-              defaultValue={searchParams.from ?? ""}
-              className="input mt-1.5"
-            />
-          </label>
-          <label className="block">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-espresso-500">
-              To
-            </span>
-            <input
-              type="date"
-              name="to"
-              defaultValue={searchParams.to ?? ""}
-              className="input mt-1.5"
-            />
-          </label>
-          <button
-            type="submit"
-            className="inline-flex items-center gap-2 rounded-full bg-espresso-700 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.15em] text-cream-50 transition-all duration-200 hover:-translate-y-0.5 hover:bg-espresso-800 active:translate-y-0 active:scale-95"
-          >
-            Apply
-          </button>
-        </form>
-      )}
-
-      <p className="text-xs text-espresso-500">
-        Showing <span className="font-semibold text-espresso-700">{label}</span>
-        {since && (
-          <>
-            {" "}
-            (since{" "}
-            <span className="font-mono">{fmtDate(since)}</span>)
-          </>
-        )}
-      </p>
+      <DateRangeFilter
+        basePath="/admin/revenue"
+        current={current}
+        resolved={resolved}
+        searchParams={searchParams}
+      />
 
       {error && (
         <div className="card border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -238,11 +110,11 @@ export default async function AdminRevenuePage({
       )}
 
       {/* 3 stat cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard
           label="Revenue"
           value={formatPkr(revenue)}
-          sub={label.toLowerCase()}
+          sub={resolved.label.toLowerCase()}
           icon={Banknote}
           tone="caramel"
         />
@@ -269,7 +141,7 @@ export default async function AdminRevenuePage({
             Revenue by day
           </p>
           <h2 className="mt-1 font-display text-lg text-espresso-800">
-            {label}
+            {resolved.label}
           </h2>
         </header>
 
@@ -283,10 +155,7 @@ export default async function AdminRevenuePage({
               const pct =
                 maxDayRevenue > 0 ? (v.revenue / maxDayRevenue) * 100 : 0;
               return (
-                <li
-                  key={day}
-                  className="px-4 py-3 sm:px-6 sm:py-3"
-                >
+                <li key={day} className="px-4 py-3 sm:px-6">
                   {/* Mobile: stacked. Desktop: 3 columns. */}
                   <div className="flex items-center justify-between gap-3 sm:hidden">
                     <span className="font-mono text-xs text-espresso-500 tabular-nums">
@@ -375,7 +244,7 @@ function StatCard({
       <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-espresso-400">
         {label}
       </p>
-      <p className="mt-1 font-display text-3xl text-espresso-800 tabular-nums">
+      <p className="mt-1 break-words font-display text-2xl text-espresso-800 tabular-nums sm:text-3xl">
         {value}
       </p>
       <p className="mt-1 text-xs text-espresso-400">{sub}</p>

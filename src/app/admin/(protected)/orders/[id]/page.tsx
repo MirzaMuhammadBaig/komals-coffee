@@ -81,13 +81,38 @@ export default async function AdminOrderDetailPage({
                 </li>
               ))}
             </ul>
-            <footer className="flex items-center justify-between border-t border-espresso-100 bg-cream-100/50 px-5 py-3">
-              <span className="text-sm font-semibold text-espresso-700">
-                Total
-              </span>
-              <span className="font-display text-xl text-espresso-800 tabular-nums">
-                {formatPkr(order.total_pkr ?? 0)}
-              </span>
+            <footer className="border-t border-espresso-100 bg-cream-100/50 px-5 py-3">
+              {/* Pricing breakdown — only shows the subtotal/discount
+                  lines when migration 003 has been applied AND the
+                  fields are present on this order row. */}
+              {typeof order.subtotal_pkr === "number" && (
+                <div className="mb-2 flex items-center justify-between text-sm text-espresso-600">
+                  <span>Subtotal</span>
+                  <span className="tabular-nums">
+                    {formatPkr(order.subtotal_pkr)}
+                  </span>
+                </div>
+              )}
+              {order.coupon_code &&
+                typeof order.discount_pkr === "number" &&
+                order.discount_pkr > 0 && (
+                  <div className="mb-2 flex items-center justify-between text-sm text-green-700">
+                    <span className="inline-flex items-center gap-1.5 font-mono tracking-wider">
+                      {order.coupon_code}
+                    </span>
+                    <span className="tabular-nums">
+                      − {formatPkr(order.discount_pkr)}
+                    </span>
+                  </div>
+                )}
+              <div className="flex items-center justify-between border-t border-espresso-200 pt-2">
+                <span className="text-sm font-semibold text-espresso-700">
+                  Total
+                </span>
+                <span className="font-display text-xl text-espresso-800 tabular-nums">
+                  {formatPkr(order.total_pkr ?? 0)}
+                </span>
+              </div>
             </footer>
           </section>
 
