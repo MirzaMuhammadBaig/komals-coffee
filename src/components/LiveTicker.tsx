@@ -1,16 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Coffee, Flame, MapPin, Sparkles, Timer } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Coffee,
+  Flame,
+  Instagram,
+  MapPin,
+  MessageCircle,
+  PowerOff,
+  Sparkles,
+  Timer,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type Tone = "caramel" | "espresso" | "green" | "red" | "cream";
 
 type Update = {
   icon: typeof Coffee;
   text: string;
-  tone: "caramel" | "espresso" | "green";
+  tone: Tone;
 };
 
-const updates: Update[] = [
+const OPEN_UPDATES: Update[] = [
   {
     icon: Flame,
     text: "Komal is brewing 3 orders right now",
@@ -43,13 +54,79 @@ const updates: Update[] = [
   },
 ];
 
-export default function LiveTicker() {
+/**
+ * Build the closed-mode rotating messages from the live store state.
+ * The set is small and honest — no fictional "brewing now" lines, no
+ * "147 cups served" stats that would contradict the closed banner.
+ */
+function buildClosedUpdates(
+  next: { dayLabel: string; time: string } | null,
+): Update[] {
+  const updates: Update[] = [
+    {
+      icon: PowerOff,
+      text: "Komal's is closed right now",
+      tone: "red",
+    },
+  ];
+  if (next) {
+    updates.push({
+      icon: Timer,
+      text: `Reopens ${next.dayLabel} at ${next.time}`,
+      tone: "cream",
+    });
+  }
+  updates.push(
+    {
+      icon: MessageCircle,
+      text: "Message Komal on WhatsApp to plan ahead",
+      tone: "green",
+    },
+    {
+      icon: Instagram,
+      text: "Catch us on @komals.coffee in the meantime",
+      tone: "caramel",
+    },
+  );
+  return updates;
+}
+
+/**
+ * Honest live-activity strip below the hero.
+ *
+ *  • Open  → rotates the lively "brewing 3 orders, last delivered to..."
+ *           messages with a pulsing GREEN dot.
+ *  • Closed → rotates closed-aware messages ("Reopens tomorrow at 11 AM"),
+ *           pulsing RED dot, "Closed" label. Never claims activity that
+ *           is not happening — the closed banner already tells customers
+ *           the store is shut.
+ */
+export default function LiveTicker({
+  isOpen,
+  next = null,
+}: {
+  isOpen: boolean;
+  next?: { dayLabel: string; time: string } | null;
+}) {
+  const updates = useMemo(
+    () => (isOpen ? OPEN_UPDATES : buildClosedUpdates(next)),
+    [isOpen, next],
+  );
+
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"in" | "out">("in");
 
+  // Reset to the first message whenever the open/closed state flips, so
+  // a customer who just landed during after-hours doesn't see a stale
+  // "brewing now" message before the first interval kicks in.
   useEffect(() => {
-    // Always rotate — short, subtle text crossfade; pauses when tab is hidden
-    // so we never waste cycles on a backgrounded tab.
+    setIndex(0);
+    setPhase("in");
+  }, [isOpen]);
+
+  useEffect(() => {
+    // Short, subtle text crossfade; pauses when the tab is hidden so we
+    // never waste cycles on a backgrounded tab.
     const tick = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
       setPhase("out");
@@ -59,24 +136,36 @@ export default function LiveTicker() {
       }, 360);
     }, 3600);
     return () => window.clearInterval(tick);
-  }, []);
+  }, [updates.length]);
 
   const current = updates[index];
   const Icon = current.icon;
+  const label = isOpen ? "Live" : "Closed";
+  const dotColor = isOpen ? "bg-green-400" : "bg-red-400";
 
   return (
     <section
-      aria-label="Live activity"
+      aria-label={isOpen ? "Live activity" : "Store closed"}
       className="relative overflow-hidden border-y border-espresso-100 bg-espresso-900 py-4 text-cream-50"
     >
-      {/* Animated dot */}
       <div className="container-base flex items-center justify-center gap-3">
+        {/* Status dot — colour matches the actual store state. */}
         <span className="relative inline-flex h-2 w-2 shrink-0">
-          <span className="absolute inset-0 animate-ping rounded-full bg-green-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+          <span
+            className={cn(
+              "absolute inset-0 animate-ping rounded-full opacity-75",
+              dotColor,
+            )}
+          />
+          <span
+            className={cn(
+              "relative inline-flex h-2 w-2 rounded-full",
+              dotColor,
+            )}
+          />
         </span>
         <span className="hidden text-[10px] font-semibold uppercase tracking-[0.3em] text-cream-100/70 sm:inline">
-          Live
+          {label}
         </span>
 
         <div
@@ -97,6 +186,8 @@ export default function LiveTicker() {
               current.tone === "caramel" && "text-caramel-400",
               current.tone === "espresso" && "text-cream-100",
               current.tone === "green" && "text-green-400",
+              current.tone === "red" && "text-red-400",
+              current.tone === "cream" && "text-cream-50",
             )}
           />
           <span className="truncate text-sm text-cream-100">
